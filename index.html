@@ -1,0 +1,1631 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Magnum Gym - Rutina de Entrenamiento</title>
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              500: '#10b981',
+              600: '#059669',
+            },
+            gym: {
+              blue: '#0284c7',
+              dark: '#0f172a'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- QR Code generator for quick phone pairing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- SheetJS for Excel export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <style>
+    body {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    input, textarea {
+      user-select: text;
+    }
+    .scrollbar-none::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-none {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col font-sans pb-28 transition-colors duration-200">
+
+  <!-- TOP HEADER -->
+  <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3 shadow-xs">
+    <div class="max-w-md mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500 to-emerald-500 flex items-center justify-center shadow-md shadow-sky-500/20 text-white">
+          <i data-lucide="dumbbell" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-base tracking-tight text-slate-900 dark:text-white leading-tight">Magnum Gym</h1>
+          <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium tracking-wide">Rutina • Jesús Vega</span>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-2">
+        <!-- THEME TOGGLE BUTTON (Light/Dark) -->
+        <button id="btn-theme-toggle" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-amber-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition active:scale-95" title="Cambiar tema claro/oscuro">
+          <i id="theme-icon" data-lucide="moon" class="w-5 h-5"></i>
+        </button>
+        <!-- QR CODE BUTTON -->
+        <button id="btn-qr" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-sky-600 dark:text-sky-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition active:scale-95" title="Conectar celular">
+          <i data-lucide="qr-code" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="flex-1 max-w-md mx-auto w-full px-4 pt-3 pb-8">
+    
+    <!-- SUB-TABS: RUTINA FULL-BODY / CLÁSICA / COMIDAS -->
+    <div id="subtabs-bar" class="flex bg-white dark:bg-slate-900 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 mb-3.5 shadow-sm">
+      <button class="tab-btn flex-1 py-2 text-xs font-bold rounded-xl transition text-center bg-sky-500 text-white shadow-sm active:scale-95" data-tab="fullbody">
+        Full Body
+      </button>
+      <button class="tab-btn flex-1 py-2 text-xs font-semibold rounded-xl transition text-center text-slate-500 dark:text-slate-400 hover:text-slate-800 active:scale-95" data-tab="magnum">
+        Magnum Clásica
+      </button>
+      <button class="tab-btn flex-1 py-2 text-xs font-semibold rounded-xl transition text-center text-slate-500 dark:text-slate-400 hover:text-slate-800 active:scale-95" data-tab="comidas">
+        🥗 Comidas
+      </button>
+    </div>
+
+    <!-- DAY SELECTOR (Only shown for workout tabs) -->
+    <div id="day-selector-container" class="mb-4">
+      <div class="flex gap-2 overflow-x-auto scrollbar-none py-1">
+        <button class="day-btn flex-1 min-w-[100px] py-2.5 px-3 rounded-2xl border-2 border-sky-500 bg-sky-50 dark:bg-sky-500/10 text-sky-600 dark:text-sky-400 transition active:scale-95 text-center shadow-xs" data-day="1">
+          <div class="font-extrabold text-sm">Día 1</div>
+          <div class="text-[10px] opacity-80 truncate" id="day-sub-1">Lunes</div>
+        </button>
+        <button class="day-btn flex-1 min-w-[100px] py-2.5 px-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 transition active:scale-95 text-center shadow-xs" data-day="2">
+          <div class="font-extrabold text-sm text-slate-800 dark:text-white">Día 2</div>
+          <div class="text-[10px] text-slate-500 dark:text-slate-400 truncate" id="day-sub-2">Miércoles</div>
+        </button>
+        <button class="day-btn flex-1 min-w-[100px] py-2.5 px-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 transition active:scale-95 text-center shadow-xs" data-day="3">
+          <div class="font-extrabold text-sm text-slate-800 dark:text-white">Día 3</div>
+          <div class="text-[10px] text-slate-500 dark:text-slate-400 truncate" id="day-sub-3">Viernes</div>
+        </button>
+      </div>
+
+      <!-- PROGRESS SUMMARY BAR -->
+      <div class="mt-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2.5 flex items-center justify-between text-xs shadow-sm">
+        <div class="flex items-center gap-2">
+          <span class="text-slate-500 dark:text-slate-400 font-medium">Progreso del día:</span>
+          <span id="day-progress-text" class="font-black text-emerald-600 dark:text-emerald-400">0/18 series listas</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <div class="w-24 bg-slate-200 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
+            <div id="day-progress-bar" class="bg-gradient-to-r from-emerald-500 to-sky-500 h-full w-0 transition-all duration-300"></div>
+          </div>
+          <button id="btn-reset-day" class="p-1 text-slate-400 hover:text-rose-500 transition active:scale-95" title="Reiniciar marcas de series de este día para nueva sesión">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- WORKOUT VIEW -->
+    <div id="workout-view" class="space-y-3.5">
+      <!-- Exercises will be dynamically injected here -->
+      <div id="exercise-list" class="space-y-3.5"></div>
+
+      <!-- ADD EXERCISE BUTTON -->
+      <button id="btn-add-exercise" class="w-full py-4 border-2 border-dashed border-slate-300 dark:border-slate-800 hover:border-sky-500 bg-white/70 dark:bg-slate-900/40 rounded-2xl flex items-center justify-center gap-2 text-slate-600 dark:text-slate-400 hover:text-sky-600 text-xs font-bold transition active:scale-98 shadow-xs">
+        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+        <span>Agregar nuevo ejercicio a este día</span>
+      </button>
+    </div>
+
+    <!-- TIMER VIEW (DEDICATED FULL SCREEN WITH EXPLICIT BACK BUTTON) -->
+    <div id="timer-view" class="hidden space-y-4">
+      <!-- BIG "VOLVER A LA RUTINA" BUTTON AT THE TOP -->
+      <button id="btn-timer-back-top" class="w-full py-3.5 px-4 bg-sky-500 hover:bg-sky-600 active:scale-98 text-white rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shadow-md shadow-sky-500/20 transition">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+        <span>← Volver a mi Rutina</span>
+      </button>
+
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm text-center space-y-6">
+        <div>
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full text-xs font-bold mb-2">
+            <i data-lucide="timer" class="w-4 h-4"></i>
+            <span>DESCANSO ENTRE SERIES</span>
+          </div>
+          <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">Temporizador de Recuperación</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Descansa entre 60 y 90 segundos para recuperar tu energía máxima</p>
+        </div>
+
+        <!-- DIGITS DISPLAY -->
+        <div class="py-8 bg-slate-50 dark:bg-slate-950 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-inner">
+          <div id="full-timer-digits" class="font-mono text-6xl font-black text-slate-900 dark:text-white tracking-wider">01:30</div>
+          <div id="full-timer-status" class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-widest">Listo para iniciar</div>
+        </div>
+
+        <!-- PRESET BUTTONS -->
+        <div>
+          <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 text-left">Tiempos rápidos:</div>
+          <div class="grid grid-cols-4 gap-2">
+            <button class="timer-preset py-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white dark:hover:bg-sky-500 text-xs font-bold text-slate-700 dark:text-slate-200 active:scale-95 transition" data-seconds="45">45s</button>
+            <button class="timer-preset py-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white dark:hover:bg-sky-500 text-xs font-bold text-slate-700 dark:text-slate-200 active:scale-95 transition" data-seconds="60">60s</button>
+            <button class="timer-preset py-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white dark:hover:bg-sky-500 text-xs font-bold text-slate-700 dark:text-slate-200 active:scale-95 transition" data-seconds="90">90s</button>
+            <button class="timer-preset py-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-sky-500 hover:text-white dark:hover:bg-sky-500 text-xs font-bold text-slate-700 dark:text-slate-200 active:scale-95 transition" data-seconds="120">2 min</button>
+          </div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="flex gap-2.5">
+          <button id="full-timer-start-btn" class="flex-1 py-4 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white font-extrabold text-base rounded-2xl transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
+            <i id="full-timer-play-icon" data-lucide="play" class="w-5 h-5 fill-current"></i>
+            <span id="full-timer-btn-text">Iniciar Descanso</span>
+          </button>
+          <button id="full-timer-add30-btn" class="px-4 py-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-2xl transition active:scale-95" title="Sumar 30 segundos">
+            +30s
+          </button>
+          <button id="full-timer-reset-btn" class="px-4 py-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 font-bold rounded-2xl transition active:scale-95" title="Reiniciar">
+            <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- BOTTOM RETURN BUTTON -->
+      <button id="btn-timer-back-bottom" class="w-full py-3 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 active:scale-98 text-slate-700 dark:text-slate-200 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        <span>Regresar a la lista de ejercicios</span>
+      </button>
+    </div>
+
+    <!-- MEALS VIEW -->
+    <div id="meals-view" class="hidden space-y-3">
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">
+            <i data-lucide="utensils" class="w-4 h-4 text-emerald-500"></i>
+            Plan Semanal de Nutrición
+          </h2>
+          <select id="meal-day-select" class="bg-slate-100 dark:bg-slate-800 text-xs font-semibold border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 text-slate-700 dark:text-slate-200 outline-none">
+            <option value="Lunes (Full-Body - Da 1)">Lunes (Full-Body Día 1)</option>
+            <option value="Martes (Descanso)">Martes (Descanso)</option>
+            <option value="Mircoles (Full-Body - Da 2)">Miércoles (Full-Body Día 2)</option>
+            <option value="Jueves (Descanso)">Jueves (Descanso)</option>
+            <option value="Viernes (Full-Body - Da 3)">Viernes (Full-Body Día 3)</option>
+            <option value="Sbado (Prep.)">Sábado (Prep.)</option>
+            <option value="Domingo (Familiar)">Domingo (Familiar)</option>
+          </select>
+        </div>
+
+        <div id="meals-container" class="space-y-3"></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS & BACKUP VIEW -->
+    <div id="settings-view" class="hidden space-y-4">
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 space-y-4 shadow-sm">
+        <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+          <i data-lucide="save" class="w-4 h-4 text-sky-500"></i>
+          Respaldo y Datos
+        </h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+          Todos los cambios que hagas de peso, repeticiones y notas se guardan automáticamente en tu celular. También puedes descargar copias de respaldo.
+        </p>
+
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button id="btn-export-json" class="py-3 px-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 text-xs font-bold text-slate-700 dark:text-slate-200 rounded-xl flex items-center justify-center gap-1.5 transition">
+            <i data-lucide="download" class="w-4 h-4 text-sky-500"></i>
+            <span>Bajar Copia JSON</span>
+          </button>
+          <button id="btn-export-excel" class="py-3 px-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 text-xs font-bold text-slate-700 dark:text-slate-200 rounded-xl flex items-center justify-center gap-1.5 transition">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-500"></i>
+            <span>Exportar a Excel</span>
+          </button>
+        </div>
+
+        <label class="block">
+          <div class="py-3 px-3 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer active:scale-95 text-xs font-bold text-slate-600 dark:text-slate-300 rounded-xl flex items-center justify-center gap-1.5 transition">
+            <i data-lucide="upload" class="w-4 h-4 text-amber-500"></i>
+            <span>Restaurar Copia Guardada</span>
+          </div>
+          <input type="file" id="file-import" accept=".json" class="hidden">
+        </label>
+
+        <button id="btn-reset-all" class="w-full py-2 text-rose-500 hover:text-rose-600 text-[11px] font-bold transition text-center">
+          Restablecer a valores iniciales del Excel
+        </button>
+      </div>
+
+      <!-- INSTRUCTIONS CARD -->
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 text-xs text-slate-500 dark:text-slate-400 space-y-2 shadow-sm">
+        <h4 class="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+          <i data-lucide="smartphone" class="w-4 h-4 text-sky-500"></i>
+          Cómo instalar como App en tu Celular
+        </h4>
+        <ol class="list-decimal pl-4 space-y-1.5">
+          <li>Abre esta página en el navegador de tu celular (Chrome o Safari).</li>
+          <li>En <strong>Android (Chrome)</strong>: Presiona los 3 puntos arriba a la derecha y toca <em>"Instalar aplicación"</em> o <em>"Añadir a pantalla de inicio"</em>.</li>
+          <li>En <strong>iPhone (Safari)</strong>: Toca el botón <em>Compartir</em> (el cuadrito con la flecha) y selecciona <em>"Añadir a la pantalla de inicio"</em>.</li>
+          <li>¡Listo! Te quedará un icono en tu celular que abre la rutina a pantalla completa como una app real.</li>
+        </ol>
+      </div>
+    </div>
+  </main>
+
+  <!-- FLOATING BOTTOM ACTIVE REST TIMER BAR (shown on workout view when timer is running) -->
+  <div id="floating-timer-bar" class="hidden fixed bottom-16 left-0 right-0 z-30 px-4">
+    <div class="max-w-md mx-auto bg-slate-900 text-white border-2 border-emerald-500 shadow-xl shadow-slate-900/20 rounded-2xl px-4 py-2.5 flex items-center justify-between">
+      <div id="float-timer-clickable" class="flex items-center gap-3 cursor-pointer">
+        <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+          <i data-lucide="timer" class="w-5 h-5 animate-pulse"></i>
+        </div>
+        <div>
+          <div class="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">Descanso en curso</div>
+          <div id="float-timer-display" class="font-mono text-xl font-black text-white">01:30</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <button id="float-btn-add30" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold text-slate-200 active:scale-95 transition">
+          +30s
+        </button>
+        <button id="float-btn-pause" class="p-2 bg-emerald-500 hover:bg-emerald-600 rounded-lg text-slate-950 font-bold active:scale-95 transition">
+          <i id="float-pause-icon" data-lucide="pause" class="w-4 h-4"></i>
+        </button>
+        <button id="float-btn-cancel" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-400 active:scale-95 transition">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAVIGATION BAR -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 py-2 px-6 shadow-lg">
+    <div class="max-w-md mx-auto flex items-center justify-around text-[10px] font-bold">
+      <button class="nav-btn flex flex-col items-center gap-1 text-sky-600 dark:text-sky-400 transition active:scale-95" data-view="workout">
+        <i data-lucide="dumbbell" class="w-5 h-5"></i>
+        <span>Rutina</span>
+      </button>
+      <button class="nav-btn flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition active:scale-95 relative" data-view="timer">
+        <i data-lucide="clock" class="w-5 h-5"></i>
+        <span>Cronómetro</span>
+        <span id="nav-timer-indicator" class="hidden absolute top-0 right-2 w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
+      </button>
+      <button class="nav-btn flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition active:scale-95" data-view="meals">
+        <i data-lucide="apple" class="w-5 h-5"></i>
+        <span>Comidas</span>
+      </button>
+      <button class="nav-btn flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition active:scale-95" data-view="settings">
+        <i data-lucide="settings" class="w-5 h-5"></i>
+        <span>Ajustes</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MODAL: EXERCISE TECHNIQUE & IMAGE VIEWER -->
+  <div id="modal-exercise-detail" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-sm w-full overflow-hidden shadow-2xl space-y-0">
+      <!-- Image header -->
+      <div class="relative bg-slate-100 dark:bg-slate-950 aspect-video flex items-center justify-center overflow-hidden border-b border-slate-200 dark:border-slate-800">
+        <img id="detail-img" src="" alt="Demostración de ejercicio" class="w-full h-full object-cover">
+        <button id="modal-detail-close" class="absolute top-3 right-3 p-1.5 rounded-full bg-slate-900/70 text-white hover:bg-slate-900 transition active:scale-95">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+        <div id="detail-badge-container" class="absolute bottom-3 left-3"></div>
+      </div>
+
+      <!-- Details content -->
+      <div class="p-5 space-y-3">
+        <h3 id="detail-title" class="font-black text-slate-900 dark:text-white text-lg leading-tight"></h3>
+
+        <!-- Posture / Technique tips -->
+        <div class="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1.5">
+          <div class="text-[11px] font-extrabold uppercase tracking-wider text-sky-600 dark:text-sky-400 flex items-center gap-1.5">
+            <i data-lucide="info" class="w-4 h-4"></i>
+            <span>Técnica y postura recomendada</span>
+          </div>
+          <p id="detail-tips" class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-medium"></p>
+        </div>
+
+        <button id="modal-detail-done" class="w-full py-3 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-xl transition active:scale-95 shadow-md shadow-sky-500/20">
+          Entendido, ¡a darle!
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: QR CODE TO CONNECT FROM PHONE -->
+  <div id="modal-qr" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-2xl text-center">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-slate-900 dark:text-white text-base">Abrir en tu Celular</h3>
+        <button id="modal-qr-close" class="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="bg-white p-4 rounded-2xl inline-block mx-auto border border-slate-200 shadow-sm">
+        <div id="qrcode-container"></div>
+      </div>
+
+      <div class="text-left bg-slate-50 dark:bg-slate-950 p-3 rounded-xl border border-slate-200 dark:border-slate-800 text-xs space-y-1.5">
+        <p class="text-slate-500 dark:text-slate-400">O ingresa esta dirección en el navegador de tu celular (conectado al mismo WiFi):</p>
+        <p id="ip-address-text" class="font-mono text-sky-600 dark:text-sky-400 font-bold select-all break-all"></p>
+      </div>
+
+      <button id="modal-qr-done" class="w-full py-3 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-xl transition">
+        Entendido
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD EXERCISE -->
+  <div id="modal-add-ex" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 max-w-sm w-full space-y-3.5 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-slate-900 dark:text-white text-base">Nuevo Ejercicio</h3>
+        <button id="modal-add-close" class="p-1 rounded-lg text-slate-400 hover:text-slate-700">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="text-slate-600 dark:text-slate-400 mb-1 block font-semibold">Nombre del ejercicio</label>
+          <input type="text" id="new-ex-name" placeholder="Ej: Remo con mancuerna" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-slate-900 dark:text-white outline-none focus:border-sky-500">
+        </div>
+        <div>
+          <label class="text-slate-600 dark:text-slate-400 mb-1 block font-semibold">Grupo muscular</label>
+          <select id="new-ex-group" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-slate-900 dark:text-white outline-none focus:border-sky-500 font-medium">
+            <option value="PIERNAS">PIERNAS</option>
+            <option value="PECHO">PECHO</option>
+            <option value="ESPALDA">ESPALDA</option>
+            <option value="HOMBROS">HOMBROS</option>
+            <option value="BÍCEPS">BÍCEPS</option>
+            <option value="TRÍCEPS">TRÍCEPS</option>
+            <option value="ISQUIOS">ISQUIOS</option>
+            <option value="GEMELOS">GEMELOS</option>
+            <option value="ABDOMINALES">ABDOMINALES</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="text-slate-600 dark:text-slate-400 mb-1 block font-semibold">Series</label>
+            <input type="number" id="new-ex-series" value="3" min="1" max="10" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white outline-none focus:border-sky-500 font-bold text-center">
+          </div>
+          <div>
+            <label class="text-slate-600 dark:text-slate-400 mb-1 block font-semibold">Reps</label>
+            <input type="text" id="new-ex-reps" value="10-12" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white outline-none focus:border-sky-500 font-bold text-center">
+          </div>
+          <div>
+            <label class="text-slate-600 dark:text-slate-400 mb-1 block font-semibold">Carga (Kg)</label>
+            <input type="number" step="0.5" id="new-ex-weight" value="30" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white outline-none focus:border-sky-500 font-bold text-center">
+          </div>
+        </div>
+      </div>
+
+      <button id="btn-save-new-ex" class="w-full py-3.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-xl transition active:scale-95 shadow-md shadow-sky-500/20">
+        Guardar Ejercicio
+      </button>
+    </div>
+  </div>
+
+  <!-- APPLICATION LOGIC -->
+  <script>
+    // Initial data from the user's Excel file with local images & technique tips
+    const INITIAL_DATA = {
+      fullbody: {
+        name: "Rutina FULL-Body",
+        days: {
+          "1": {
+            subtitle: "Piernas • Pecho • Espalda",
+            exercises: [
+              { 
+                id: "fb_1_1", 
+                group: "PIERNAS", 
+                name: "Prensa 45", 
+                series: 3, 
+                reps: "10-12", 
+                weight: 50, 
+                notes: "", 
+                completedSets: [false, false, false],
+                image: "images/exercises/prensa_45.jpg",
+                tips: "Espalda y glúteos firmemente apoyados en el respaldo. Coloca los pies al ancho de hombros en la plataforma. Baja con control hasta formar 90° sin despegar la zona lumbar y empuja con la planta de los pies sin trabar totalmente las rodillas."
+              },
+              { 
+                id: "fb_1_2", 
+                group: "PECHO", 
+                name: "Press plano c/barra", 
+                series: 3, 
+                reps: "10-12", 
+                weight: 30, 
+                notes: "", 
+                completedSets: [false, false, false],
+                image: "images/exercises/press_plano.jpg",
+                tips: "Retrae escápulas y apoya bien los pies en el suelo. Baja la barra de forma controlada hasta la mitad del pecho (esternón) y empuja con fuerza explosiva controlada hacia arriba."
+              },
+              { 
+                id: "fb_1_3", 
+                group: "ESPALDA", 
+                name: "Tirones en polea por delante dorsalera", 
+                series: 3, 
+                reps: "10-12", 
+                weight: 50, 
+                notes: "", 
+                completedSets: [false, false, false],
+                image: "images/exercises/dorsalera_polea.jpg",
+                tips: "Pecho alto y hombros hacia abajo. Agarre ligeramente más ancho que los hombros. Tira de la barra hacia la parte alta del pecho guiando con los codos y apretando los dorsales 1 segundo al final."
+              },
+              { 
+                id: "fb_1_4", 
+                group: "HOMBROS", 
+                name: "Vuelos laterales", 
+                series: 3, 
+                reps: "10-12", 
+                weight: 10, 
+                notes: "", 
+                completedSets: [false, false, false],
+                image: "images/exercises/vuelos_laterales.jpg",
+                tips: "Codos levemente flexionados. Eleva las mancuernas lateralmente hasta la altura de los hombros guiando con los codos, sin encoger el cuello ni usar balanceo con las piernas."
+              },
+              { 
+                id: "fb_1_5", 
+                group: "BÍCEPS", 
+                name: "Curl parado con barra", 
+                series: 3, 
+                reps: "10-12", 
+                weight: 20, 
+                notes: "", 
+                completedSets: [false, false, false],
+                image: "images/exercises/curl_barra.jpg",
+                tips: "Codos fijos y pegados a los costados del torso. Flexiona los brazos apretando los bíceps arriba y baja lentamente en 2-3 segundos para mayor estímulo muscular."
+              },
+              { 
+                id: "fb_1_6", 
+                group: "GEMELOS", 
+                name: "Gemelos parado", 
+                series: 3, 
+                reps: "12-15", 
+                weight: 50, 
+                notes: "", 
+                completedSets: [false, false, false],
+                image: "images/exercises/gemelos_parado.jpg",
+                tips: "Apoya la punta de los pies en el borde. Sube a máxima extensión sobre las puntas aguantando 1 segundo arriba y desciende estirando bien el talón hacia abajo."
+              }
+            ]
+          },
+          "2": {
+            subtitle: "Hack • Press Máquina • Remo",
+            exercises: [
+              { 
+                id: "fb_2_1", 
+                group: "PIERNAS", 
+                name: "Hack", 
+                series: 3, 
+                reps: "10-12", 
+                weight: 40, 
+                notes: "", 
+                completedSets: [false, false, false],
+                image: "images/exercises/hack.jpg",
+                tips: "Espalda completamente apoyada en el respaldo y hombros bajo los soportes. Desciende suavemente flexionando rodillas a 90° y empuja empujando el suelo con los talones."
+              },
+              { 
+                id: "fb_2_2", 
+                group: "HOMBROS", 
+                name: "Press Máquina", 
+                series: 3, 
+                reps: "10-12", 
+                weight: 30, 
+                notes: "", 
+                completedSets: [false, false, false],
+                image: "images/exercises/press_maquina.jpg",
+                tips: "Regula la altura del asiento para que las manillas queden al nivel de tus orejas/hombros. Empuja verticalmente de manera uniforme sin curvar la espalda baja."
+              },
+              { 
+                id: "fb_2_3", 
+                group: "ESPALDA", 
+                name: "Remo sentado con polea baja", 
+                series: 3, 
+                reps: "10-12", 
+                weight: 45, 
+                notes: "", 
+                completedSets: [false, false, false],
+                image: "images/exercises/remo_polea_baja.jpg",
+                tips: "Espalda erguida y rodillas ligeramente flexionadas. Tira del agarre hacia la zona del ombligo retrayendo los omóplatos y manteniendo el pecho inflado."
+              },
+              { 
+                id: "fb_2_4", 
+                group: "PECHO", 
+                name: "Peck deck", 
+                series: 3, 
+                reps: "10-12", 
+                weight: 40, 
+                notes: "", 
+                completedSets: [false, false, false],
+                image: "images/exercises/peck_deck.jpg",
+                tips: "Ajusta el asiento para que los brazos queden paralelos al suelo. Cierra los brazos juntándolos al centro del pecho con una contracción profunda de 1 segundo."
+              },
+              { 
+                id: "fb_2_5", 
+                group: "TRÍCEPS", 
+                name: "Extensión en polea", 
+                series: 3, 
+                reps: "10-12", 
+                weight: 40, 
+                notes: "", 
+                completedSets: [false, false, false],
+                image: "images/exercises/extension_polea.jpg",
+                tips: "Codos bien fijos al torso, no los desplaces hacia adelante ni atrás. Extiende completamente los codos hacia abajo apretando el tríceps."
+              },
+              { 
+                id: "fb_2_6", 
+                group: "ISQUIOS", 
+                name: "Camilla isquios", 
+                series: 3, 
+                reps: "10-12", 
+                weight: 30, 
+                notes: "", 
+                completedSets: [false, false, false],
+                image: "images/exercises/camilla_isquios.jpg",
+                tips: "Rodillo apoyado justo encima de los talones. Flexiona las piernas llevando los talones hacia los glúteos sin despegar la pelvis de la camilla."
+              }
+            ]
+          },
+          "3": {
+            subtitle: "Press Hammer • Dorsal • Sillón",
+            exercises: [
+              { 
+                id: "fb_3_1", 
+                group: "PECHO", 
+                name: "Press Hammer", 
+                series: 3, 
+                reps: "10-12", 
+                weight: 40, 
+                notes: "", 
+                completedSets: [false, false, false],
+                image: "images/exercises/press_hammer.jpg",
+                tips: "Asiento regulado a la altura media del pectoral. Aprieta el respaldo y empuja hacia adelante focalizando la fuerza en el pecho sin forzar los hombros."
+              },
+              { 
+                id: "fb_3_2", 
+                group: "ESPALDA", 
+                name: "Tirones con agarre Cerrado", 
+                series: 3, 
+                reps: "10-12", 
+                weight: 45, 
+                notes: "", 
+                completedSets: [false, false, false],
+                image: "images/exercises/tirones_cerrado.jpg",
+                tips: "Con el agarre en V (triángulo), inclina el torso levemente hacia atrás y tira hacia la parte superior del pecho juntando las escápulas."
+              },
+              { 
+                id: "fb_3_3", 
+                group: "PIERNAS", 
+                name: "Sillón cuádriceps", 
+                series: 3, 
+                reps: "10-12", 
+                weight: 70, 
+                notes: "", 
+                completedSets: [false, false, false],
+                image: "images/exercises/sillon_cuadriceps.jpg",
+                tips: "Alinea las rodillas con el eje de giro de la máquina. Extiende las piernas y mantén 1 segundo arriba apretando los cuádriceps antes de descender lentamente."
+              },
+              { 
+                id: "fb_3_4", 
+                group: "BÍCEPS", 
+                name: "Curl banco scott", 
+                series: 3, 
+                reps: "10-12", 
+                weight: 5, 
+                notes: "", 
+                completedSets: [false, false, false],
+                image: "images/exercises/banco_scott.jpg",
+                tips: "Axilas bien calzadas en la almohadilla inclinada. Flexiona los codos aislando el bíceps sin despegar los brazos del soporte."
+              },
+              { 
+                id: "fb_3_5", 
+                group: "BÍCEPS", 
+                name: "Concentrado c/manc. martillo", 
+                series: 3, 
+                reps: "10-12", 
+                weight: 7.5, 
+                notes: "", 
+                completedSets: [false, false, false],
+                image: "images/exercises/martillo.jpg",
+                tips: "Palmas mirándose entre sí (agarre neutro). Eleva la mancuerna controlando el movimiento para desarrollar el braquial y el grosor del brazo."
+              },
+              { 
+                id: "fb_3_6", 
+                group: "ISQUIOS", 
+                name: "Camilla isquios", 
+                series: 3, 
+                reps: "10-12", 
+                weight: 30, 
+                notes: "", 
+                completedSets: [false, false, false],
+                image: "images/exercises/camilla_isquios.jpg",
+                tips: "Movimiento controlado, evita los tirones bruscos. Siente la tensión constante en la parte posterior del muslo durante toda la serie."
+              }
+            ]
+          }
+        }
+      },
+      magnum: {
+        name: "Rutina Magnum Gym",
+        days: {
+          "1": {
+            subtitle: "Espalda • Bíceps",
+            exercises: [
+              { id: "mg_1_1", group: "ESPALDA", name: "Tirones en polea por delante dorsalera", series: 4, reps: "12", weight: 45, notes: "", completedSets: [false, false, false, false], image: "images/exercises/dorsalera_polea.jpg", tips: "Pecho alto, tira con los codos hacia abajo y atrás apretando dorsales." },
+              { id: "mg_1_2", group: "ESPALDA", name: "Tirones con agarre Cerrado", series: 4, reps: "12", weight: 45, notes: "", completedSets: [false, false, false, false], image: "images/exercises/tirones_cerrado.jpg", tips: "Agarre triángulo al pecho alto con ligera inclinación del torso." },
+              { id: "mg_1_3", group: "ESPALDA", name: "Remo sentado con polea baja", series: 4, reps: "12", weight: 45, notes: "", completedSets: [false, false, false, false], image: "images/exercises/remo_polea_baja.jpg", tips: "Espalda recta, tira hacia el abdomen juntando las escápulas." },
+              { id: "mg_1_4", group: "BÍCEPS", name: "Curl parado con barra", series: 4, reps: "12", weight: 20, notes: "", completedSets: [false, false, false, false], image: "images/exercises/curl_barra.jpg", tips: "Codos pegados al cuerpo, subida controlada sin balancear la cadera." },
+              { id: "mg_1_5", group: "BÍCEPS", name: "Curl banco scott", series: 4, reps: "12", weight: 5, notes: "", completedSets: [false, false, false, false], image: "images/exercises/banco_scott.jpg", tips: "Aísla el bíceps con los brazos bien apoyados en la almohadilla." },
+              { id: "mg_1_6", group: "BÍCEPS", name: "Concentrado c/manc. martillo", series: 4, reps: "12", weight: 7.5, notes: "", completedSets: [false, false, false, false], image: "images/exercises/martillo.jpg", tips: "Agarre neutro para trabajar el braquial y el antebrazo." }
+            ]
+          },
+          "2": {
+            subtitle: "Piernas Completas",
+            exercises: [
+              { id: "mg_2_1", group: "PIERNAS", name: "Prensa 45", series: 4, reps: "12", weight: 50, notes: "2*20+2*5", completedSets: [false, false, false, false], image: "images/exercises/prensa_45.jpg", tips: "Pies al ancho de hombros, baja a 90° con la cintura apoyada." },
+              { id: "mg_2_2", group: "PIERNAS", name: "Sillón cuádriceps", series: 4, reps: "12", weight: 70, notes: "", completedSets: [false, false, false, false], image: "images/exercises/sillon_cuadriceps.jpg", tips: "Extiende y aprieta 1 segundo arriba." },
+              { id: "mg_2_3", group: "PIERNAS", name: "Camilla isquios", series: 4, reps: "12", weight: 30, notes: "", completedSets: [false, false, false, false], image: "images/exercises/camilla_isquios.jpg", tips: "Lleva los talones a los glúteos de forma suave y controlada." },
+              { id: "mg_2_4", group: "PIERNAS", name: "Hack", series: 4, reps: "12", weight: 40, notes: "", completedSets: [false, false, false, false], image: "images/exercises/hack.jpg", tips: "Espalda apoyada por completo, desciende a 90° controlando rodillas." },
+              { id: "mg_2_5", group: "PIERNAS", name: "Gemelos parado", series: 4, reps: "12", weight: 35, notes: "", completedSets: [false, false, false, false], image: "images/exercises/gemelos_parado.jpg", tips: "Pausa en contracción máxima arriba y buen estiramiento abajo." }
+            ]
+          },
+          "3": {
+            subtitle: "Pecho • Hombros • Tríceps",
+            exercises: [
+              { id: "mg_3_1", group: "PECHO", name: "Press plano c/barra", series: 4, reps: "12", weight: 20, notes: "", completedSets: [false, false, false, false], image: "images/exercises/press_plano.jpg", tips: "Retracción escapular, baja al esternón y empuja firme." },
+              { id: "mg_3_2", group: "PECHO", name: "Peck deck", series: 4, reps: "12", weight: 30, notes: "", completedSets: [false, false, false, false], image: "images/exercises/peck_deck.jpg", tips: "Codos a media altura de pecho, aprieta al centro 1 segundo." },
+              { id: "mg_3_3", group: "PECHO", name: "Press Hammer", series: 4, reps: "12", weight: 30, notes: "", completedSets: [false, false, false, false], image: "images/exercises/press_hammer.jpg", tips: "Empuje directo focalizando en el pectoral mayor." },
+              { id: "mg_3_4", group: "HOMBROS", name: "Vuelos laterales", series: 4, reps: "12", weight: 7.5, notes: "", completedSets: [false, false, false, false], image: "images/exercises/vuelos_laterales.jpg", tips: "Guía con los codos sin encoger el cuello." },
+              { id: "mg_3_5", group: "HOMBROS", name: "Press Máquina", series: 4, reps: "12", weight: 25, notes: "", completedSets: [false, false, false, false], image: "images/exercises/press_maquina.jpg", tips: "Asiento regulado a la altura de los hombros, empuje vertical." },
+              { id: "mg_3_6", group: "TRÍCEPS", name: "Extensión en polea", series: 4, reps: "12", weight: 30, notes: "", completedSets: [false, false, false, false], image: "images/exercises/extension_polea.jpg", tips: "Codos pegados a los costados, extiende completamente hacia abajo." }
+            ]
+          }
+        }
+      },
+      comidas: {
+        "Lunes (Full-Body - Da 1)": {
+          desayuno: "3 Huevos revueltos + 1 pan pita casero tostado",
+          almuerzo: "Bife Carne con arroz (Carne de las milas), tipo poke verduras",
+          merienda: "1 Pan pita con pollo desmenuzado o queso magro",
+          cena: "Tortilla de acelga al horno + ensalada fresca"
+        },
+        "Martes (Descanso)": {
+          desayuno: "3 Huevos revueltos + 1 pan pita casero tostado",
+          almuerzo: "Tortilla de acelga al horno + ensalada fresca",
+          merienda: "1 Pan pita con pollo desmenuzado o queso magro",
+          cena: "Pollo asado (sin piel) y cebollas, limitando la papa/batata"
+        },
+        "Mircoles (Full-Body - Da 2)": {
+          desayuno: "3 Huevos revueltos + 1 pan pita casero tostado",
+          almuerzo: "Pollo asado (sin piel) y cebollas, limitando la papa/batata",
+          merienda: "1 Pan pita con pollo desmenuzado o queso magro",
+          cena: "Kafta + ensalada fresca"
+        },
+        "Jueves (Descanso)": {
+          desayuno: "3 Huevos revueltos + 1 pan pita casero tostado",
+          almuerzo: "Kafta + ensalada fresca",
+          merienda: "1 Pan pita con pollo desmenuzado o queso magro",
+          cena: "Guiso de lentejas con carne"
+        },
+        "Viernes (Full-Body - Da 3)": {
+          desayuno: "3 Huevos revueltos + 1 pan pita casero tostado",
+          almuerzo: "Guiso de lentejas con carne",
+          merienda: "1 Pan pita con pollo desmenuzado o queso magro",
+          cena: "Pizza al molde (Masa finita)"
+        },
+        "Sbado (Prep.)": {
+          desayuno: "3 Huevos revueltos + 1 pan pita casero tostado",
+          almuerzo: "2 medallones de carne al plato (sin pan) con queso, lechuga, tomate y un huevo a la plancha. Pocas papas al horno.",
+          merienda: "1 Pan pita con pollo desmenuzado o queso magro",
+          cena: "Wok de pollo y vegetales"
+        },
+        "Domingo (Familiar)": {
+          desayuno: "3 Huevos revueltos + 1 pan pita casero tostado",
+          almuerzo: "Bife Carne con puré (Carne de las milas)",
+          merienda: "1 Pan pita con pollo desmenuzado o queso magro",
+          cena: "Kafta + ensalada fresca"
+        }
+      }
+    };
+
+    // State
+    const STORAGE_KEY = 'magnum_gym_data_v3';
+    const THEME_KEY = 'magnum_gym_theme';
+    let appData = null;
+    let currentTab = 'fullbody'; // 'fullbody' | 'magnum' | 'comidas'
+    let currentDay = '1';       // '1' | '2' | '3'
+    let currentView = 'workout'; // 'workout' | 'timer' | 'meals' | 'settings'
+
+    // THEME MANAGEMENT (Default: Light / Color Claro)
+    function initTheme() {
+      const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
+      applyTheme(savedTheme);
+    }
+
+    function applyTheme(theme) {
+      const root = document.documentElement;
+      const themeIcon = document.getElementById('theme-icon');
+      if (theme === 'dark') {
+        root.classList.add('dark');
+        root.classList.remove('light');
+        if (themeIcon) themeIcon.setAttribute('data-lucide', 'sun');
+      } else {
+        root.classList.remove('dark');
+        root.classList.add('light');
+        if (themeIcon) themeIcon.setAttribute('data-lucide', 'moon');
+      }
+      localStorage.setItem(THEME_KEY, theme);
+      lucide.createIcons();
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.contains('dark');
+      applyTheme(isDark ? 'light' : 'dark');
+    }
+
+    // Load or initialize state with automatic image & tips backfill
+    function loadData() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        try {
+          appData = JSON.parse(stored);
+        } catch (e) {
+          appData = JSON.parse(JSON.stringify(INITIAL_DATA));
+        }
+      } else {
+        // Migrate from v2 or v1 if exists
+        const v2 = localStorage.getItem('magnum_gym_data_v2') || localStorage.getItem('magnum_gym_data_v1');
+        if (v2) {
+          try {
+            appData = JSON.parse(v2);
+            // Backfill images and tips from INITIAL_DATA into existing exercises!
+            ['fullbody', 'magnum'].forEach(routineKey => {
+              if (appData[routineKey] && appData[routineKey].days) {
+                ['1', '2', '3'].forEach(d => {
+                  if (appData[routineKey].days[d]) {
+                    const initList = INITIAL_DATA[routineKey].days[d].exercises;
+                    appData[routineKey].days[d].exercises.forEach(ex => {
+                      const match = initList.find(i => i.id === ex.id || i.name.toLowerCase() === ex.name.toLowerCase());
+                      if (match) {
+                        ex.image = match.image;
+                        ex.tips = match.tips;
+                      }
+                    });
+                  }
+                });
+              }
+            });
+          } catch(e) {
+            appData = JSON.parse(JSON.stringify(INITIAL_DATA));
+          }
+        } else {
+          appData = JSON.parse(JSON.stringify(INITIAL_DATA));
+        }
+        saveData();
+      }
+    }
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+    }
+
+    // High-contrast badges for Light mode
+    const MUSCLE_BADGES = {
+      'PIERNAS': 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30',
+      'PECHO': 'bg-sky-100 text-sky-800 border-sky-300 dark:bg-sky-500/10 dark:text-sky-400 dark:border-sky-500/30',
+      'ESPALDA': 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30',
+      'HOMBROS': 'bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/30',
+      'BÍCEPS': 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/30',
+      'TRÍCEPS': 'bg-cyan-100 text-cyan-800 border-cyan-300 dark:bg-cyan-500/10 dark:text-cyan-400 dark:border-cyan-500/30',
+      'ISQUIOS': 'bg-indigo-100 text-indigo-800 border-indigo-300 dark:bg-indigo-500/10 dark:text-indigo-400 dark:border-indigo-500/30',
+      'GEMELOS': 'bg-teal-100 text-teal-800 border-teal-300 dark:bg-teal-500/10 dark:text-teal-400 dark:border-teal-500/30',
+      'ABDOMINALES': 'bg-violet-100 text-violet-800 border-violet-300 dark:bg-violet-500/10 dark:text-violet-400 dark:border-violet-500/30'
+    };
+
+    function getMuscleBadge(group) {
+      const clean = (group || '').toUpperCase().trim();
+      const style = MUSCLE_BADGES[clean] || 'bg-slate-200 text-slate-800 border-slate-300 dark:bg-slate-800 dark:text-slate-300';
+      return `<span class="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold border uppercase tracking-wider ${style}">${clean}</span>`;
+    }
+
+    // Audio & Haptic feedback
+    function playBeep() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.7);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.7);
+        if (navigator.vibrate) navigator.vibrate([250, 100, 250]);
+      } catch (e) {
+        console.log("Audio not allowed yet", e);
+      }
+    }
+
+    function haptic() {
+      if (navigator.vibrate) navigator.vibrate(25);
+    }
+
+    // REST TIMER STATE
+    let timerInterval = null;
+    let timerTotalSeconds = 90;
+    let timerRemaining = 90;
+    let timerIsRunning = false;
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function updateTimerUI() {
+      const formatted = formatTime(timerRemaining);
+      
+      const fullDigits = document.getElementById('full-timer-digits');
+      if (fullDigits) fullDigits.textContent = formatted;
+      
+      const fullStatus = document.getElementById('full-timer-status');
+      if (fullStatus) {
+        fullStatus.textContent = timerIsRunning 
+          ? 'En cuenta regresiva • ¡Recupérate!' 
+          : (timerRemaining === 0 ? '¡TIEMPO CUMPLIDO! A DARLE' : 'Pausado');
+      }
+
+      const fullPlayIcon = document.getElementById('full-timer-play-icon');
+      const fullBtnText = document.getElementById('full-timer-btn-text');
+      if (fullPlayIcon && fullBtnText) {
+        if (timerIsRunning) {
+          fullPlayIcon.setAttribute('data-lucide', 'pause');
+          fullBtnText.textContent = 'Pausar Descanso';
+        } else {
+          fullPlayIcon.setAttribute('data-lucide', 'play');
+          fullBtnText.textContent = timerRemaining === 0 ? 'Reiniciar Descanso' : 'Continuar Descanso';
+        }
+      }
+
+      const floatBar = document.getElementById('floating-timer-bar');
+      const floatDisplay = document.getElementById('float-timer-display');
+      const floatPauseIcon = document.getElementById('float-pause-icon');
+      const navIndicator = document.getElementById('nav-timer-indicator');
+
+      if (floatDisplay) floatDisplay.textContent = formatted;
+
+      if (timerIsRunning) {
+        if (currentView === 'workout') {
+          floatBar.classList.remove('hidden');
+        } else {
+          floatBar.classList.add('hidden');
+        }
+        if (navIndicator) navIndicator.classList.remove('hidden');
+        if (floatPauseIcon) floatPauseIcon.setAttribute('data-lucide', 'pause');
+      } else {
+        if (floatPauseIcon) floatPauseIcon.setAttribute('data-lucide', 'play');
+        if (timerRemaining === 0 || timerRemaining === timerTotalSeconds) {
+          floatBar.classList.add('hidden');
+          if (navIndicator) navIndicator.classList.add('hidden');
+        }
+      }
+      lucide.createIcons();
+    }
+
+    function startTimer(seconds) {
+      if (seconds !== undefined) {
+        timerTotalSeconds = seconds;
+        timerRemaining = seconds;
+      }
+      clearInterval(timerInterval);
+      timerIsRunning = true;
+      updateTimerUI();
+
+      timerInterval = setInterval(() => {
+        timerRemaining--;
+        if (timerRemaining <= 0) {
+          clearInterval(timerInterval);
+          timerRemaining = 0;
+          timerIsRunning = false;
+          playBeep();
+          updateTimerUI();
+        } else {
+          updateTimerUI();
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      if (timerIsRunning) {
+        clearInterval(timerInterval);
+        timerIsRunning = false;
+      } else {
+        if (timerRemaining <= 0) timerRemaining = timerTotalSeconds;
+        startTimer();
+      }
+      updateTimerUI();
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timerIsRunning = false;
+      timerRemaining = timerTotalSeconds;
+      updateTimerUI();
+    }
+
+    // NAVIGATION SWITCHER
+    function switchView(view) {
+      currentView = view;
+      
+      const workoutEl = document.getElementById('workout-view');
+      const timerEl = document.getElementById('timer-view');
+      const mealsEl = document.getElementById('meals-view');
+      const settingsEl = document.getElementById('settings-view');
+      const subtabsBar = document.getElementById('subtabs-bar');
+      const daySelector = document.getElementById('day-selector-container');
+      const floatBar = document.getElementById('floating-timer-bar');
+
+      workoutEl.classList.toggle('hidden', view !== 'workout');
+      timerEl.classList.toggle('hidden', view !== 'timer');
+      mealsEl.classList.toggle('hidden', view !== 'meals');
+      settingsEl.classList.toggle('hidden', view !== 'settings');
+
+      if (view === 'workout') {
+        subtabsBar.classList.remove('hidden');
+        daySelector.classList.remove('hidden');
+        if (timerIsRunning) floatBar.classList.remove('hidden');
+        renderApp();
+      } else if (view === 'meals') {
+        subtabsBar.classList.remove('hidden');
+        daySelector.classList.add('hidden');
+        floatBar.classList.add('hidden');
+        renderMeals();
+      } else if (view === 'timer') {
+        subtabsBar.classList.add('hidden');
+        daySelector.classList.add('hidden');
+        floatBar.classList.add('hidden');
+        updateTimerUI();
+      } else if (view === 'settings') {
+        subtabsBar.classList.add('hidden');
+        daySelector.classList.add('hidden');
+        floatBar.classList.add('hidden');
+      }
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        const isActive = btn.dataset.view === view;
+        btn.classList.toggle('text-sky-600', isActive);
+        btn.classList.toggle('dark:text-sky-400', isActive);
+        btn.classList.toggle('text-slate-400', !isActive);
+        btn.classList.toggle('dark:text-slate-500', !isActive);
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // RENDER ROUTINE & EXERCISES WITH IMAGE THUMBNAILS
+    function renderApp() {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        const isCurrent = btn.dataset.tab === currentTab;
+        btn.classList.toggle('bg-sky-500', isCurrent);
+        btn.classList.toggle('text-white', isCurrent);
+        btn.classList.toggle('font-bold', isCurrent);
+        btn.classList.toggle('shadow-sm', isCurrent);
+        btn.classList.toggle('text-slate-500', !isCurrent);
+        btn.classList.toggle('dark:text-slate-400', !isCurrent);
+      });
+
+      document.querySelectorAll('.day-btn').forEach(btn => {
+        const isCurrent = btn.dataset.day === currentDay;
+        btn.classList.toggle('border-2', isCurrent);
+        btn.classList.toggle('border-sky-500', isCurrent);
+        btn.classList.toggle('bg-sky-50', isCurrent);
+        btn.classList.toggle('dark:bg-sky-500/10', isCurrent);
+        btn.classList.toggle('text-sky-600', isCurrent);
+        btn.classList.toggle('dark:text-sky-400', isCurrent);
+        btn.classList.toggle('border-slate-200', !isCurrent);
+        btn.classList.toggle('dark:border-slate-800', !isCurrent);
+        btn.classList.toggle('bg-white', !isCurrent);
+        btn.classList.toggle('dark:bg-slate-900', !isCurrent);
+      });
+
+      if (currentTab === 'fullbody' || currentTab === 'magnum') {
+        const routineObj = appData[currentTab];
+        document.getElementById('day-sub-1').textContent = routineObj.days['1'].subtitle || 'Día 1';
+        document.getElementById('day-sub-2').textContent = routineObj.days['2'].subtitle || 'Día 2';
+        document.getElementById('day-sub-3').textContent = routineObj.days['3'].subtitle || 'Día 3';
+        renderExercises();
+      }
+
+      lucide.createIcons();
+    }
+
+    function openExerciseDetail(ex) {
+      document.getElementById('detail-title').textContent = ex.name;
+      document.getElementById('detail-tips').textContent = ex.tips || "Mantén la postura correcta, realiza el rango completo de movimiento y controla tanto la subida como la bajada del peso.";
+      document.getElementById('detail-badge-container').innerHTML = getMuscleBadge(ex.group);
+      
+      const imgEl = document.getElementById('detail-img');
+      if (ex.image) {
+        imgEl.src = ex.image;
+        imgEl.classList.remove('hidden');
+      } else {
+        imgEl.classList.add('hidden');
+      }
+      
+      document.getElementById('modal-exercise-detail').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function renderExercises() {
+      const routine = appData[currentTab];
+      const dayData = routine.days[currentDay];
+      const listEl = document.getElementById('exercise-list');
+      listEl.innerHTML = '';
+
+      let totalSets = 0;
+      let completedSets = 0;
+
+      dayData.exercises.forEach((ex) => {
+        const numSeries = parseInt(ex.series) || 3;
+        totalSets += numSeries;
+        
+        if (!ex.completedSets || !Array.isArray(ex.completedSets)) {
+          ex.completedSets = new Array(numSeries).fill(false);
+        }
+        while (ex.completedSets.length < numSeries) ex.completedSets.push(false);
+
+        const checkedCount = ex.completedSets.filter(Boolean).length;
+        completedSets += checkedCount;
+
+        // Series Buttons
+        let seriesGridHtml = '';
+        for (let i = 0; i < numSeries; i++) {
+          const isDone = ex.completedSets[i];
+          seriesGridHtml += `
+            <button class="set-check-btn flex-1 py-2.5 px-1.5 rounded-xl border-2 transition active:scale-95 flex flex-col items-center justify-center gap-0.5 ${
+              isDone 
+                ? 'bg-emerald-500 border-emerald-500 text-white shadow-md shadow-emerald-500/20' 
+                : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-emerald-400'
+            }" data-ex-id="${ex.id}" data-set-index="${i}">
+              <div class="flex items-center gap-1 font-extrabold text-xs">
+                <span>Serie ${i + 1}</span>
+                ${isDone ? '<i data-lucide="check-circle-2" class="w-4 h-4 fill-white text-emerald-500"></i>' : ''}
+              </div>
+              <span class="text-[10px] font-semibold ${isDone ? 'text-emerald-100' : 'text-slate-400'}">
+                ${isDone ? '¡Completada!' : 'Toca al terminar'}
+              </span>
+            </button>
+          `;
+        }
+
+        const isAllDone = checkedCount === numSeries && numSeries > 0;
+
+        // Thumbnail image element (tap to enlarge)
+        const thumbHtml = ex.image ? `
+          <div class="btn-open-detail cursor-pointer relative w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shrink-0 shadow-xs active:scale-95 transition" data-ex-id="${ex.id}" title="Toca para ver foto ampliada y técnica">
+            <img src="${ex.image}" alt="${ex.name}" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black/10 flex items-center justify-center opacity-0 hover:opacity-100 transition">
+              <i data-lucide="zoom-in" class="w-4 h-4 text-white drop-shadow"></i>
+            </div>
+          </div>
+        ` : `
+          <div class="w-12 h-12 rounded-2xl bg-sky-50 dark:bg-sky-500/10 border border-sky-200 dark:border-sky-500/20 text-sky-600 flex items-center justify-center shrink-0">
+            <i data-lucide="dumbbell" class="w-5 h-5"></i>
+          </div>
+        `;
+
+        const card = document.createElement('div');
+        card.className = `bg-white dark:bg-slate-900 border ${isAllDone ? 'border-emerald-400/80 ring-1 ring-emerald-400/30' : 'border-slate-200 dark:border-slate-800'} rounded-3xl p-4 shadow-sm space-y-3.5 transition`;
+        card.innerHTML = `
+          <!-- Header: Thumbnail + Name + Muscle + Technique Button -->
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              ${thumbHtml}
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5 mb-1">
+                  ${getMuscleBadge(ex.group)}
+                  <button class="btn-open-detail text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1" data-ex-id="${ex.id}">
+                    <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                    <span>Ver foto</span>
+                  </button>
+                </div>
+                <h3 class="font-extrabold text-slate-900 dark:text-white text-base leading-snug truncate">${ex.name}</h3>
+              </div>
+            </div>
+            
+            <button class="btn-delete-ex p-2 text-slate-300 hover:text-rose-500 rounded-xl transition" data-ex-id="${ex.id}" title="Eliminar ejercicio">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <!-- CARGA & REPS CONTROLS -->
+          <div class="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-950/80 p-3 rounded-2xl border border-slate-200/80 dark:border-slate-800">
+            <!-- Carga (Kg) -->
+            <div>
+              <div class="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Carga (Kg)</div>
+              <div class="flex items-center gap-1 mt-1.5">
+                <button class="btn-mod-weight px-2 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold active:scale-95 shadow-xs" data-ex-id="${ex.id}" data-delta="-2.5">-2.5</button>
+                <input type="number" step="0.5" value="${ex.weight}" class="input-weight w-14 text-center font-black text-slate-900 dark:text-white bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg py-1 text-sm outline-none focus:border-sky-500 shadow-xs" data-ex-id="${ex.id}">
+                <button class="btn-mod-weight px-2 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold active:scale-95 shadow-xs" data-ex-id="${ex.id}" data-delta="2.5">+2.5</button>
+                <button class="btn-mod-weight px-2 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold active:scale-95 shadow-xs" data-ex-id="${ex.id}" data-delta="5">+5</button>
+              </div>
+            </div>
+
+            <!-- Series & Reps -->
+            <div class="flex flex-col justify-center pl-2 border-l border-slate-200 dark:border-slate-800">
+              <div class="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Series × Reps</div>
+              <div class="flex items-center gap-1.5 mt-1.5">
+                <input type="number" min="1" max="10" value="${ex.series}" class="input-series w-10 text-center font-bold text-slate-800 dark:text-white bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg py-1 text-xs outline-none focus:border-sky-500 shadow-xs" data-ex-id="${ex.id}">
+                <span class="text-xs font-bold text-slate-400">×</span>
+                <input type="text" value="${ex.reps}" class="input-reps w-16 text-center font-bold text-slate-800 dark:text-white bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg py-1 text-xs outline-none focus:border-sky-500 shadow-xs" data-ex-id="${ex.id}">
+                <span class="text-[11px] text-slate-400 font-medium">reps</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- SERIES PROGRESS CHECKER -->
+          <div>
+            <div class="flex items-center justify-between text-xs mb-2">
+              <span class="font-bold text-slate-600 dark:text-slate-300">Marcar series completadas:</span>
+              <span class="font-extrabold ${checkedCount === numSeries ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}">
+                ${checkedCount} de ${numSeries} listas
+              </span>
+            </div>
+            <!-- Interactive series buttons -->
+            <div class="flex gap-2">
+              ${seriesGridHtml}
+            </div>
+          </div>
+
+          <!-- NOTES FIELD -->
+          <div>
+            <input type="text" placeholder="Notas (ej: máquina 4, asiento en 3)..." value="${ex.notes || ''}" class="input-notes w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-700 dark:text-slate-300 placeholder-slate-400 outline-none focus:border-sky-400" data-ex-id="${ex.id}">
+          </div>
+        `;
+        listEl.appendChild(card);
+      });
+
+      // Update progress bar
+      const progressPercent = totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0;
+      document.getElementById('day-progress-text').textContent = `${completedSets}/${totalSets} series (${progressPercent}%)`;
+      document.getElementById('day-progress-bar').style.width = `${progressPercent}%`;
+
+      lucide.createIcons();
+      attachExerciseListeners();
+    }
+
+    function attachExerciseListeners() {
+      const routine = appData[currentTab];
+      const dayData = routine.days[currentDay];
+
+      // Open Exercise Detail / Technique Modal
+      document.querySelectorAll('.btn-open-detail').forEach(btn => {
+        btn.onclick = (e) => {
+          haptic();
+          const exId = e.currentTarget.dataset.exId;
+          const ex = dayData.exercises.find(x => x.id === exId);
+          if (ex) openExerciseDetail(ex);
+        };
+      });
+
+      // Weight modifier buttons
+      document.querySelectorAll('.btn-mod-weight').forEach(btn => {
+        btn.onclick = (e) => {
+          haptic();
+          const exId = e.currentTarget.dataset.exId;
+          const delta = parseFloat(e.currentTarget.dataset.delta);
+          const ex = dayData.exercises.find(x => x.id === exId);
+          if (ex) {
+            let current = parseFloat(ex.weight) || 0;
+            current = Math.max(0, current + delta);
+            ex.weight = current;
+            saveData();
+            renderExercises();
+          }
+        };
+      });
+
+      // Weight direct input
+      document.querySelectorAll('.input-weight').forEach(input => {
+        input.onchange = (e) => {
+          const exId = e.currentTarget.dataset.exId;
+          const ex = dayData.exercises.find(x => x.id === exId);
+          if (ex) {
+            ex.weight = parseFloat(e.currentTarget.value) || 0;
+            saveData();
+          }
+        };
+      });
+
+      // Series input
+      document.querySelectorAll('.input-series').forEach(input => {
+        input.onchange = (e) => {
+          const exId = e.currentTarget.dataset.exId;
+          const ex = dayData.exercises.find(x => x.id === exId);
+          if (ex) {
+            const newCount = Math.max(1, parseInt(e.currentTarget.value) || 3);
+            ex.series = newCount;
+            while (ex.completedSets.length < newCount) ex.completedSets.push(false);
+            if (ex.completedSets.length > newCount) ex.completedSets = ex.completedSets.slice(0, newCount);
+            saveData();
+            renderExercises();
+          }
+        };
+      });
+
+      // Reps input
+      document.querySelectorAll('.input-reps').forEach(input => {
+        input.onchange = (e) => {
+          const exId = e.currentTarget.dataset.exId;
+          const ex = dayData.exercises.find(x => x.id === exId);
+          if (ex) {
+            ex.reps = e.currentTarget.value;
+            saveData();
+          }
+        };
+      });
+
+      // Notes input
+      document.querySelectorAll('.input-notes').forEach(input => {
+        input.oninput = (e) => {
+          const exId = e.currentTarget.dataset.exId;
+          const ex = dayData.exercises.find(x => x.id === exId);
+          if (ex) {
+            ex.notes = e.currentTarget.value;
+            saveData();
+          }
+        };
+      });
+
+      // Set check buttons
+      document.querySelectorAll('.set-check-btn').forEach(btn => {
+        btn.onclick = (e) => {
+          haptic();
+          const exId = e.currentTarget.dataset.exId;
+          const setIdx = parseInt(e.currentTarget.dataset.setIndex);
+          const ex = dayData.exercises.find(x => x.id === exId);
+          if (ex) {
+            const wasDone = ex.completedSets[setIdx];
+            ex.completedSets[setIdx] = !wasDone;
+            saveData();
+            renderExercises();
+
+            if (!wasDone) {
+              startTimer(90);
+            }
+          }
+        };
+      });
+
+      // Delete exercise
+      document.querySelectorAll('.btn-delete-ex').forEach(btn => {
+        btn.onclick = (e) => {
+          const exId = e.currentTarget.dataset.exId;
+          if (confirm("¿Seguro que deseas eliminar este ejercicio de la rutina?")) {
+            dayData.exercises = dayData.exercises.filter(x => x.id !== exId);
+            saveData();
+            renderExercises();
+          }
+        };
+      });
+    }
+
+    // MEALS RENDER
+    function renderMeals() {
+      const select = document.getElementById('meal-day-select');
+      const selectedDay = select.value;
+      const dayMeals = appData.comidas[selectedDay] || {};
+      const container = document.getElementById('meals-container');
+      
+      const mealCards = [
+        { label: "🍳 Desayuno", text: dayMeals.desayuno },
+        { label: "🥩 Almuerzo", text: dayMeals.almuerzo },
+        { label: "🥪 Merienda", text: dayMeals.merienda },
+        { label: "🥗 Cena", text: dayMeals.cena }
+      ];
+
+      container.innerHTML = mealCards.map(m => `
+        <div class="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <div class="font-extrabold text-xs text-sky-600 dark:text-sky-400 mb-1">${m.label}</div>
+          <div class="text-xs text-slate-800 dark:text-slate-200 leading-relaxed font-medium">${m.text || 'Sin definir'}</div>
+        </div>
+      `).join('');
+    }
+
+    // INITIALIZATION & EVENT HANDLERS
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      loadData();
+      renderApp();
+
+      // Theme toggle button
+      document.getElementById('btn-theme-toggle').onclick = () => {
+        haptic();
+        toggleTheme();
+      };
+
+      // Modal detail close
+      document.getElementById('modal-detail-close').onclick = () => {
+        document.getElementById('modal-exercise-detail').classList.add('hidden');
+      };
+      document.getElementById('modal-detail-done').onclick = () => {
+        document.getElementById('modal-exercise-detail').classList.add('hidden');
+      };
+
+      // Top Tab switching (Full-Body / Magnum / Comidas)
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.onclick = () => {
+          haptic();
+          const tab = btn.dataset.tab;
+          if (tab === 'comidas') {
+            switchView('meals');
+          } else {
+            currentTab = tab;
+            switchView('workout');
+          }
+        };
+      });
+
+      // Day switching (1 / 2 / 3)
+      document.querySelectorAll('.day-btn').forEach(btn => {
+        btn.onclick = () => {
+          haptic();
+          currentDay = btn.dataset.day;
+          renderApp();
+        };
+      });
+
+      // Reset day progress
+      document.getElementById('btn-reset-day').onclick = () => {
+        if (confirm("¿Deseas reiniciar las marcas de series de este día para una nueva sesión de entrenamiento?")) {
+          const routine = appData[currentTab];
+          routine.days[currentDay].exercises.forEach(ex => {
+            ex.completedSets = ex.completedSets.map(() => false);
+          });
+          saveData();
+          renderExercises();
+        }
+      };
+
+      // Bottom Navigation Buttons
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.onclick = () => {
+          haptic();
+          const view = btn.dataset.view;
+          switchView(view);
+        };
+      });
+
+      // Explicit "Volver a la Rutina" buttons from Timer View
+      document.getElementById('btn-timer-back-top').onclick = () => {
+        haptic();
+        switchView('workout');
+      };
+      document.getElementById('btn-timer-back-bottom').onclick = () => {
+        haptic();
+        switchView('workout');
+      };
+
+      // Timer Controls inside Dedicated View
+      document.getElementById('full-timer-start-btn').onclick = () => {
+        haptic();
+        pauseTimer();
+      };
+      document.getElementById('full-timer-add30-btn').onclick = () => {
+        haptic();
+        timerRemaining += 30;
+        updateTimerUI();
+      };
+      document.getElementById('full-timer-reset-btn').onclick = () => {
+        haptic();
+        resetTimer();
+      };
+      document.querySelectorAll('.timer-preset').forEach(btn => {
+        btn.onclick = () => {
+          haptic();
+          const s = parseInt(btn.dataset.seconds);
+          startTimer(s);
+        };
+      });
+
+      // Floating Timer Click (opens Timer screen)
+      document.getElementById('float-timer-clickable').onclick = () => {
+        haptic();
+        switchView('timer');
+      };
+      document.getElementById('float-btn-add30').onclick = () => {
+        haptic();
+        timerRemaining += 30;
+        updateTimerUI();
+      };
+      document.getElementById('float-btn-pause').onclick = () => {
+        haptic();
+        pauseTimer();
+      };
+      document.getElementById('float-btn-cancel').onclick = () => {
+        haptic();
+        resetTimer();
+        document.getElementById('floating-timer-bar').classList.add('hidden');
+      };
+
+      // Meal select change
+      document.getElementById('meal-day-select').onchange = renderMeals;
+
+      // Add Exercise Modal
+      document.getElementById('btn-add-exercise').onclick = () => {
+        document.getElementById('modal-add-ex').classList.remove('hidden');
+        document.getElementById('new-ex-name').focus();
+      };
+      document.getElementById('modal-add-close').onclick = () => {
+        document.getElementById('modal-add-ex').classList.add('hidden');
+      };
+      document.getElementById('btn-save-new-ex').onclick = () => {
+        const name = document.getElementById('new-ex-name').value.trim();
+        if (!name) return alert("Por favor ingresa el nombre del ejercicio.");
+        const group = document.getElementById('new-ex-group').value;
+        const series = parseInt(document.getElementById('new-ex-series').value) || 3;
+        const reps = document.getElementById('new-ex-reps').value.trim() || "10-12";
+        const weight = parseFloat(document.getElementById('new-ex-weight').value) || 0;
+
+        const newEx = {
+          id: 'custom_' + Date.now(),
+          group,
+          name,
+          series,
+          reps,
+          weight,
+          notes: "",
+          completedSets: new Array(series).fill(false),
+          image: "",
+          tips: "Controla la postura y la respiración durante todo el recorrido."
+        };
+
+        appData[currentTab].days[currentDay].exercises.push(newEx);
+        saveData();
+        renderExercises();
+        document.getElementById('modal-add-ex').classList.add('hidden');
+        document.getElementById('new-ex-name').value = '';
+      };
+
+      // QR Code Modal & IP
+      document.getElementById('btn-qr').onclick = () => {
+        document.getElementById('modal-qr').classList.remove('hidden');
+        const qrContainer = document.getElementById('qrcode-container');
+        qrContainer.innerHTML = '';
+        const phoneUrl = `http://192.168.1.107:8085`;
+        new QRCode(qrContainer, {
+          text: phoneUrl,
+          width: 180,
+          height: 180,
+          colorDark: "#0f172a",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+        document.getElementById('ip-address-text').textContent = phoneUrl;
+      };
+      document.getElementById('modal-qr-close').onclick = () => {
+        document.getElementById('modal-qr').classList.add('hidden');
+      };
+      document.getElementById('modal-qr-done').onclick = () => {
+        document.getElementById('modal-qr').classList.add('hidden');
+      };
+
+      // Export JSON
+      document.getElementById('btn-export-json').onclick = () => {
+        const blob = new Blob([JSON.stringify(appData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Rutina_Magnum_Gym_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+      };
+
+      // Export Excel
+      document.getElementById('btn-export-excel').onclick = () => {
+        const wb = XLSX.utils.book_new();
+
+        const fbRows = [["Día", "Grupo", "Ejercicio", "Series", "Reps", "Carga (Kg)", "Notas"]];
+        ['1', '2', '3'].forEach(d => {
+          appData.fullbody.days[d].exercises.forEach(ex => {
+            fbRows.push([`Día ${d}`, ex.group, ex.name, ex.series, ex.reps, ex.weight, ex.notes || ""]);
+          });
+        });
+        const wsFB = XLSX.utils.aoa_to_sheet(fbRows);
+        XLSX.utils.book_append_sheet(wb, wsFB, "Rutina FULL-Body");
+
+        const mgRows = [["Día", "Grupo", "Ejercicio", "Series", "Reps", "Carga (Kg)", "Notas"]];
+        ['1', '2', '3'].forEach(d => {
+          appData.magnum.days[d].exercises.forEach(ex => {
+            mgRows.push([`Día ${d}`, ex.group, ex.name, ex.series, ex.reps, ex.weight, ex.notes || ""]);
+          });
+        });
+        const wsMG = XLSX.utils.aoa_to_sheet(mgRows);
+        XLSX.utils.book_append_sheet(wb, wsMG, "Rutina Magnum Gym");
+
+        const mealDays = Object.keys(appData.comidas);
+        const comRows = [
+          ["Comida", ...mealDays],
+          ["Desayuno", ...mealDays.map(d => appData.comidas[d].desayuno)],
+          ["Almuerzo", ...mealDays.map(d => appData.comidas[d].almuerzo)],
+          ["Merienda", ...mealDays.map(d => appData.comidas[d].merienda)],
+          ["Cena", ...mealDays.map(d => appData.comidas[d].cena)]
+        ];
+        const wsCom = XLSX.utils.aoa_to_sheet(comRows);
+        XLSX.utils.book_append_sheet(wb, wsCom, "Comidas");
+
+        XLSX.writeFile(wb, `Rutina_Magnum_Gym_Actualizada_${new Date().toISOString().slice(0,10)}.xlsx`);
+      };
+
+      // Import JSON
+      document.getElementById('file-import').onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          try {
+            const imported = JSON.parse(evt.target.result);
+            if (imported.fullbody && imported.magnum) {
+              appData = imported;
+              saveData();
+              renderApp();
+              alert("¡Copia restaurada exitosamente!");
+            } else {
+              alert("El archivo no tiene el formato correcto.");
+            }
+          } catch (err) {
+            alert("Error al leer el archivo JSON.");
+          }
+        };
+        reader.readAsText(file);
+      };
+
+      // Reset All to default
+      document.getElementById('btn-reset-all').onclick = () => {
+        if (confirm("¿Estás seguro de que deseas restablecer todos los datos a los valores originales del Excel? Se perderán las modificaciones actuales.")) {
+          appData = JSON.parse(JSON.stringify(INITIAL_DATA));
+          saveData();
+          renderApp();
+          alert("Rutina restablecida a los valores originales.");
+        }
+      };
+
+      // Register Service Worker
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW register fail', err));
+      }
+    });
+  </script>
+</body>
+</html>
