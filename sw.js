@@ -1,4 +1,4 @@
-const CACHE_NAME = 'magnum-gym-v2';
+const CACHE_NAME = 'titan-gym-v3';
 const STATIC_ASSETS = [
   './',
   './index.html',

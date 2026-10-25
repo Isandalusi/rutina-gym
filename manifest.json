@@ -1,6 +1,6 @@
 {
-  "name": "Magnum Gym - Rutina Full Body",
-  "short_name": "MagnumGym",
+  "name": "Titan Gym - Rutina Full Body",
+  "short_name": "TitanGym",
   "description": "App para registro y control de rutina de entrenamiento y cargas",
   "start_url": "./index.html",
   "display": "standalone",

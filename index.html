@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" class="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Magnum Gym - Rutina de Entrenamiento</title>
+  <title>Titan Gym - Rutina de Entrenamiento</title>
   <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -67,7 +67,7 @@
           <i data-lucide="dumbbell" class="w-5 h-5"></i>
         </div>
         <div>
-          <h1 class="font-bold text-base tracking-tight text-slate-900 dark:text-white leading-tight">Magnum Gym</h1>
+          <h1 class="font-bold text-base tracking-tight text-slate-900 dark:text-white leading-tight">Titan Gym</h1>
           <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium tracking-wide">Rutina • Jesús Vega</span>
         </div>
       </div>
@@ -94,7 +94,7 @@
         Full Body
       </button>
       <button class="tab-btn flex-1 py-2 text-xs font-semibold rounded-xl transition text-center text-slate-500 dark:text-slate-400 hover:text-slate-800 active:scale-95" data-tab="magnum">
-        Magnum Clásica
+        Titan Clásica
       </button>
       <button class="tab-btn flex-1 py-2 text-xs font-semibold rounded-xl transition text-center text-slate-500 dark:text-slate-400 hover:text-slate-800 active:scale-95" data-tab="comidas">
         🥗 Comidas
@@ -676,7 +676,7 @@
         }
       },
       magnum: {
-        name: "Rutina Magnum Gym",
+        name: "Rutina Titan Gym",
         days: {
           "1": {
             subtitle: "Espalda • Bíceps",
@@ -1548,7 +1548,7 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `Rutina_Magnum_Gym_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+        a.download = `Rutina_Titan_Gym_Backup_${new Date().toISOString().slice(0, 10)}.json`;
         a.click();
       };
 
@@ -1572,7 +1572,7 @@
           });
         });
         const wsMG = XLSX.utils.aoa_to_sheet(mgRows);
-        XLSX.utils.book_append_sheet(wb, wsMG, "Rutina Magnum Gym");
+        XLSX.utils.book_append_sheet(wb, wsMG, "Rutina Titan Gym");
 
         const mealDays = Object.keys(appData.comidas);
         const comRows = [
@@ -1585,7 +1585,7 @@
         const wsCom = XLSX.utils.aoa_to_sheet(comRows);
         XLSX.utils.book_append_sheet(wb, wsCom, "Comidas");
 
-        XLSX.writeFile(wb, `Rutina_Magnum_Gym_Actualizada_${new Date().toISOString().slice(0,10)}.xlsx`);
+        XLSX.writeFile(wb, `Rutina_Titan_Gym_Actualizada_${new Date().toISOString().slice(0,10)}.xlsx`);
       };
 
       // Import JSON
