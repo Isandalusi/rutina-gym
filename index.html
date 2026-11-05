@@ -206,11 +206,40 @@
 
     <!-- MEALS VIEW -->
     <div id="meals-view" class="hidden space-y-3">
+      <!-- TARGET MACROS SUMMARY BANNER -->
+      <div class="bg-gradient-to-r from-sky-500 to-emerald-500 rounded-3xl p-4 text-white shadow-md">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[11px] font-extrabold uppercase tracking-wider opacity-90">🎯 Tu Objetivo Diario (Estético • Recomposición)</span>
+          <span class="text-xs font-black bg-white/20 px-2.5 py-0.5 rounded-full">180 cm • 99 kg</span>
+        </div>
+        <div class="grid grid-cols-4 gap-2 text-center bg-black/15 rounded-2xl p-2.5">
+          <div>
+            <div class="text-sm font-black">2.150</div>
+            <div class="text-[10px] font-semibold opacity-85">kcal/día</div>
+          </div>
+          <div>
+            <div class="text-sm font-black">170 g</div>
+            <div class="text-[10px] font-semibold opacity-85">Proteína</div>
+          </div>
+          <div>
+            <div class="text-sm font-black">195 g</div>
+            <div class="text-[10px] font-semibold opacity-85">Carbos</div>
+          </div>
+          <div>
+            <div class="text-sm font-black">72 g</div>
+            <div class="text-[10px] font-semibold opacity-85">Grasas</div>
+          </div>
+        </div>
+        <p class="text-[11px] mt-2 opacity-90 font-medium leading-snug">
+          ⚡ <strong>Estrategia:</strong> 75% de la comida concentrada entre la mañana y el mediodía (donde tenés hambre) y cenas livianas de fácil digestión.
+        </p>
+      </div>
+
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm">
         <div class="flex items-center justify-between mb-4">
           <h2 class="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">
             <i data-lucide="utensils" class="w-4 h-4 text-emerald-500"></i>
-            Plan Semanal de Nutrición
+            Plan Semanal Optimizado
           </h2>
           <select id="meal-day-select" class="bg-slate-100 dark:bg-slate-800 text-xs font-semibold border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 text-slate-700 dark:text-slate-200 outline-none">
             <option value="Lunes (Full-Body - Da 1)">Lunes (Full-Body Día 1)</option>
@@ -597,7 +626,7 @@
             ]
           },
           "3": {
-            subtitle: "Press Hammer • Dorsal • Sillón",
+            subtitle: "Press Hammer • Dorsal • Piernas • Brazos",
             exercises: [
               { 
                 id: "fb_3_1", 
@@ -636,16 +665,16 @@
                 tips: "Alinea las rodillas con el eje de giro de la máquina. Extiende las piernas y mantén 1 segundo arriba apretando los cuádriceps antes de descender lentamente."
               },
               { 
-                id: "fb_3_4", 
-                group: "BÍCEPS", 
-                name: "Curl banco scott", 
+                id: "fb_3_6", 
+                group: "ISQUIOS", 
+                name: "Camilla isquios", 
                 series: 3, 
                 reps: "10-12", 
-                weight: 5, 
-                notes: "", 
+                weight: 30, 
+                notes: "Hacer seguido del sillón de cuádriceps", 
                 completedSets: [false, false, false],
-                image: "images/exercises/banco_scott.jpg",
-                tips: "Axilas bien calzadas en la almohadilla inclinada. Flexiona los codos aislando el bíceps sin despegar los brazos del soporte."
+                image: "images/exercises/camilla_isquios.jpg",
+                tips: "Movimiento controlado, evita los tirones bruscos. Siente la tensión constante en la parte posterior del muslo durante toda la serie."
               },
               { 
                 id: "fb_3_5", 
@@ -654,22 +683,22 @@
                 series: 3, 
                 reps: "10-12", 
                 weight: 7.5, 
-                notes: "", 
+                notes: "Alternable con Banco Scott", 
                 completedSets: [false, false, false],
                 image: "images/exercises/martillo.jpg",
                 tips: "Palmas mirándose entre sí (agarre neutro). Eleva la mancuerna controlando el movimiento para desarrollar el braquial y el grosor del brazo."
               },
               { 
-                id: "fb_3_6", 
-                group: "ISQUIOS", 
-                name: "Camilla isquios", 
+                id: "fb_3_4", 
+                group: "TRÍCEPS", 
+                name: "Extensión en polea (Soga o Barra)", 
                 series: 3, 
                 reps: "10-12", 
-                weight: 30, 
-                notes: "", 
+                weight: 35, 
+                notes: "Equilibrio de brazo (Bíceps + Tríceps)", 
                 completedSets: [false, false, false],
-                image: "images/exercises/camilla_isquios.jpg",
-                tips: "Movimiento controlado, evita los tirones bruscos. Siente la tensión constante en la parte posterior del muslo durante toda la serie."
+                image: "images/exercises/extension_polea.jpg",
+                tips: "Codos fijos a los costados del torso. Extiende por completo hacia abajo apretando el tríceps 1 segundo al final del recorrido."
               }
             ]
           }
@@ -714,52 +743,52 @@
       },
       comidas: {
         "Lunes (Full-Body - Da 1)": {
-          desayuno: "3 Huevos revueltos + 1 pan pita casero tostado",
-          almuerzo: "Bife Carne con arroz (Carne de las milas), tipo poke verduras",
-          merienda: "1 Pan pita con pollo desmenuzado o queso magro",
-          cena: "Tortilla de acelga al horno + ensalada fresca"
+          desayuno: "3 Huevos revueltos + 1 pan pita casero tostado + 1 fruta (banana o manzana). A media mañana: 1 yogur proteico o puñado de frutos secos.",
+          almuerzo: "⚡ COMIDA FUERTE: 220g Bife de carne magra (carne de milas) + 1 taza grande de arroz cocido + verduras tipo poke (~750 kcal • 55g Prot).",
+          merienda: "1 Pan pita relleno con 100g de pollo desmenuzado (o jamón magro + queso + 1 huevo duro).",
+          cena: "🌙 CENA LIVIANA: Tortilla de acelga al horno (con 3 huevos o +1 lata de atún) + ensalada fresca."
         },
         "Martes (Descanso)": {
-          desayuno: "3 Huevos revueltos + 1 pan pita casero tostado",
-          almuerzo: "Tortilla de acelga al horno + ensalada fresca",
-          merienda: "1 Pan pita con pollo desmenuzado o queso magro",
-          cena: "Pollo asado (sin piel) y cebollas, limitando la papa/batata"
+          desayuno: "3 Huevos revueltos + 1 pan pita casero tostado + 1 fruta. A media mañana: 1 yogur proteico o 2 huevos duros.",
+          almuerzo: "⚡ COMIDA FUERTE: 220g Pollo asado (sin piel) + papas/batatas al horno (150-200g) + cebollas asadas y ensalada.",
+          merienda: "1 Pan pita relleno con 100g de pollo desmenuzado (o atún/jamón magro + queso).",
+          cena: "🌙 CENA LIVIANA: Tortilla de acelga al horno (con 3 huevos o trozos de pollo) + ensalada fresca."
         },
         "Mircoles (Full-Body - Da 2)": {
-          desayuno: "3 Huevos revueltos + 1 pan pita casero tostado",
-          almuerzo: "Pollo asado (sin piel) y cebollas, limitando la papa/batata",
-          merienda: "1 Pan pita con pollo desmenuzado o queso magro",
-          cena: "Kafta + ensalada fresca"
+          desayuno: "3 Huevos revueltos + 1 pan pita casero tostado + 1 banana (energía pre-entreno). A media mañana: 1 yogur proteico.",
+          almuerzo: "⚡ COMIDA FUERTE: 220g Pollo asado (sin piel) + buena porción de papa/batata al horno o arroz + cebollas y ensalada.",
+          merienda: "1 Pan pita relleno con 100g de pollo desmenuzado + 1 fruta.",
+          cena: "🌙 CENA LIVIANA: Kafta (150-180g) + ensalada fresca liviana."
         },
         "Jueves (Descanso)": {
-          desayuno: "3 Huevos revueltos + 1 pan pita casero tostado",
-          almuerzo: "Kafta + ensalada fresca",
-          merienda: "1 Pan pita con pollo desmenuzado o queso magro",
-          cena: "Guiso de lentejas con carne"
+          desayuno: "3 Huevos revueltos + 1 pan pita casero tostado + 1 fruta. A media mañana: 1 yogur proteico.",
+          almuerzo: "⚡ COMIDA FUERTE: Guiso de lentejas con 200g de carne magra y vegetales (pasado al mediodía para máxima saciedad).",
+          merienda: "1 Pan pita con 100g de pollo desmenuzado (o jamón cocido magro + queso).",
+          cena: "🌙 CENA LIVIANA: Kafta (150-180g) o revuelto de huevos + ensalada fresca."
         },
         "Viernes (Full-Body - Da 3)": {
-          desayuno: "3 Huevos revueltos + 1 pan pita casero tostado",
-          almuerzo: "Guiso de lentejas con carne",
-          merienda: "1 Pan pita con pollo desmenuzado o queso magro",
-          cena: "Pizza al molde (Masa finita)"
+          desayuno: "3 Huevos revueltos + 1 pan pita casero tostado + 1 banana. A media mañana: 1 yogur proteico.",
+          almuerzo: "⚡ COMIDA FUERTE: Guiso de lentejas con 200g de carne magra (combustible ideal post-entreno).",
+          merienda: "1 Pan pita con 100g de pollo desmenuzado.",
+          cena: "🍕 CENA SOCIAL: Pizza al molde (Masa finita, 3 porciones con buena muzzarella/jamón)."
         },
         "Sbado (Prep.)": {
-          desayuno: "3 Huevos revueltos + 1 pan pita casero tostado",
-          almuerzo: "2 medallones de carne al plato (sin pan) con queso, lechuga, tomate y un huevo a la plancha. Pocas papas al horno.",
-          merienda: "1 Pan pita con pollo desmenuzado o queso magro",
-          cena: "Wok de pollo y vegetales"
+          desayuno: "3 Huevos revueltos + 1 pan pita casero tostado + 1 fruta.",
+          almuerzo: "⚡ COMIDA FUERTE: 2 medallones de carne al plato (220g) con queso magro, 1 huevo a la plancha, lechuga, tomate y papas al horno.",
+          merienda: "1 Pan pita con 100g de pollo desmenuzado + 1 fruta.",
+          cena: "🌙 CENA LIVIANA: Wok de pollo (180g) y vegetales salteados."
         },
         "Domingo (Familiar)": {
-          desayuno: "3 Huevos revueltos + 1 pan pita casero tostado",
-          almuerzo: "Bife Carne con puré (Carne de las milas)",
-          merienda: "1 Pan pita con pollo desmenuzado o queso magro",
-          cena: "Kafta + ensalada fresca"
+          desayuno: "3 Huevos revueltos + 1 pan pita casero tostado + 1 fruta.",
+          almuerzo: "⚡ COMIDA FUERTE: 220g Bife de carne magra (carne de milas) con buena porción de puré de papas/calabaza.",
+          merienda: "1 Pan pita con 100g de pollo desmenuzado (o jamón y queso magro).",
+          cena: "🌙 CENA LIVIANA: Kafta (150-180g) o sobras livianas + ensalada fresca."
         }
       }
     };
 
     // State
-    const STORAGE_KEY = 'magnum_gym_data_v3';
+    const STORAGE_KEY = 'magnum_gym_data_v4';
     const THEME_KEY = 'magnum_gym_theme';
     let appData = null;
     let currentTab = 'fullbody'; // 'fullbody' | 'magnum' | 'comidas'
@@ -793,7 +822,7 @@
       applyTheme(isDark ? 'light' : 'dark');
     }
 
-    // Load or initialize state with automatic image & tips backfill
+    // Load or initialize state with automatic migration preserving user weights
     function loadData() {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
@@ -803,22 +832,22 @@
           appData = JSON.parse(JSON.stringify(INITIAL_DATA));
         }
       } else {
-        // Migrate from v2 or v1 if exists
-        const v2 = localStorage.getItem('magnum_gym_data_v2') || localStorage.getItem('magnum_gym_data_v1');
-        if (v2) {
+        const prev = localStorage.getItem('magnum_gym_data_v3') || localStorage.getItem('magnum_gym_data_v2') || localStorage.getItem('magnum_gym_data_v1');
+        appData = JSON.parse(JSON.stringify(INITIAL_DATA));
+        if (prev) {
           try {
-            appData = JSON.parse(v2);
-            // Backfill images and tips from INITIAL_DATA into existing exercises!
+            const oldData = JSON.parse(prev);
+            // Preserve custom weights and notes from previous version
             ['fullbody', 'magnum'].forEach(routineKey => {
-              if (appData[routineKey] && appData[routineKey].days) {
+              if (oldData[routineKey] && oldData[routineKey].days) {
                 ['1', '2', '3'].forEach(d => {
-                  if (appData[routineKey].days[d]) {
-                    const initList = INITIAL_DATA[routineKey].days[d].exercises;
-                    appData[routineKey].days[d].exercises.forEach(ex => {
-                      const match = initList.find(i => i.id === ex.id || i.name.toLowerCase() === ex.name.toLowerCase());
-                      if (match) {
-                        ex.image = match.image;
-                        ex.tips = match.tips;
+                  if (oldData[routineKey].days[d] && appData[routineKey].days[d]) {
+                    appData[routineKey].days[d].exercises.forEach(newEx => {
+                      const oldEx = oldData[routineKey].days[d].exercises.find(o => o.id === newEx.id && o.name === newEx.name);
+                      if (oldEx) {
+                        newEx.weight = oldEx.weight;
+                        if (oldEx.notes) newEx.notes = oldEx.notes;
+                        if (oldEx.completedSets) newEx.completedSets = oldEx.completedSets;
                       }
                     });
                   }
@@ -826,10 +855,8 @@
               }
             });
           } catch(e) {
-            appData = JSON.parse(JSON.stringify(INITIAL_DATA));
+            console.log("Migration fallback", e);
           }
-        } else {
-          appData = JSON.parse(JSON.stringify(INITIAL_DATA));
         }
         saveData();
       }
