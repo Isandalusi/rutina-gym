@@ -762,13 +762,13 @@
         },
         "Jueves (Descanso)": {
           desayuno: "3 Huevos revueltos + 1 pan pita casero tostado + 1 fruta. A media mañana: 1 yogur proteico.",
-          almuerzo: "⚡ COMIDA FUERTE: Guiso de lentejas con 200g de carne magra y vegetales (pasado al mediodía para máxima saciedad).",
+          almuerzo: "⚡ COMIDA FUERTE: Pastel de papa magro (220g carne picada especial + huevo duro + puré de papa/calabaza sin manteca) + ensalada.",
           merienda: "1 Pan pita con 100g de pollo desmenuzado (o jamón cocido magro + queso).",
           cena: "🌙 CENA LIVIANA: Kafta (150-180g) o revuelto de huevos + ensalada fresca."
         },
         "Viernes (Full-Body - Da 3)": {
           desayuno: "3 Huevos revueltos + 1 pan pita casero tostado + 1 banana. A media mañana: 1 yogur proteico.",
-          almuerzo: "⚡ COMIDA FUERTE: Guiso de lentejas con 200g de carne magra (combustible ideal post-entreno).",
+          almuerzo: "⚡ COMIDA FUERTE: Pastel de papa magro con carne especial y huevo duro (combustible ideal post-entreno).",
           merienda: "1 Pan pita con 100g de pollo desmenuzado.",
           cena: "🍕 CENA SOCIAL: Pizza al molde (Masa finita, 3 porciones con buena muzzarella/jamón)."
         },
@@ -788,7 +788,7 @@
     };
 
     // State
-    const STORAGE_KEY = 'magnum_gym_data_v4';
+    const STORAGE_KEY = 'magnum_gym_data_v5';
     const THEME_KEY = 'magnum_gym_theme';
     let appData = null;
     let currentTab = 'fullbody'; // 'fullbody' | 'magnum' | 'comidas'
@@ -832,7 +832,7 @@
           appData = JSON.parse(JSON.stringify(INITIAL_DATA));
         }
       } else {
-        const prev = localStorage.getItem('magnum_gym_data_v3') || localStorage.getItem('magnum_gym_data_v2') || localStorage.getItem('magnum_gym_data_v1');
+        const prev = localStorage.getItem('magnum_gym_data_v4') || localStorage.getItem('magnum_gym_data_v3') || localStorage.getItem('magnum_gym_data_v2') || localStorage.getItem('magnum_gym_data_v1');
         appData = JSON.parse(JSON.stringify(INITIAL_DATA));
         if (prev) {
           try {
