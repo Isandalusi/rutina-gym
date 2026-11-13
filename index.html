@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Magnum Gym - Rutina de Entrenamiento</title>
+  <title>Kratos - Rutina de Entrenamiento</title>
   <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -45,7 +45,7 @@
           <i data-lucide="dumbbell" class="w-5 h-5"></i>
         </div>
         <div>
-          <h1 class="font-bold text-base tracking-tight text-slate-900 dark:text-white leading-tight">Magnum Gym</h1>
+          <h1 class="font-bold text-base tracking-tight text-slate-900 dark:text-white leading-tight">Kratos</h1>
           <div class="flex items-center gap-1.5">
             <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium tracking-wide">Rutina • Jesús Vega</span>
             <span id="offline-header-pill" class="hidden px-1.5 py-0.5 rounded-full text-[9px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30">SIN SEÑAL</span>
@@ -75,7 +75,7 @@
         Full Body
       </button>
       <button class="tab-btn flex-1 py-2 text-xs font-semibold rounded-xl transition text-center text-slate-500 dark:text-slate-400 hover:text-slate-800 active:scale-95" data-tab="magnum">
-        Magnum Clásica
+        Kratos Clásica
       </button>
       <button class="tab-btn flex-1 py-2 text-xs font-semibold rounded-xl transition text-center text-slate-500 dark:text-slate-400 hover:text-slate-800 active:scale-95" data-tab="comidas">
         🥗 Comidas
@@ -704,7 +704,7 @@
         }
       },
       magnum: {
-        name: "Rutina Magnum Gym",
+        name: "Rutina Kratos Clásica",
         days: {
           "1": {
             subtitle: "Espalda • Bíceps",
@@ -1422,7 +1422,7 @@
         document.getElementById('modal-exercise-detail').classList.add('hidden');
       };
 
-      // Top Tab switching (Full-Body / Magnum / Comidas)
+      // Top Tab switching (Full-Body / Clasica / Comidas)
       document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.onclick = () => {
           haptic();
@@ -1590,7 +1590,7 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `Rutina_Magnum_Gym_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+        a.download = `Rutina_Kratos_Backup_${new Date().toISOString().slice(0, 10)}.json`;
         a.click();
       };
 
@@ -1617,7 +1617,7 @@
           });
         });
         const wsMG = XLSX.utils.aoa_to_sheet(mgRows);
-        XLSX.utils.book_append_sheet(wb, wsMG, "Rutina Magnum Gym");
+        XLSX.utils.book_append_sheet(wb, wsMG, "Rutina Kratos Clasica");
 
         const mealDays = Object.keys(appData.comidas);
         const comRows = [
@@ -1630,7 +1630,7 @@
         const wsCom = XLSX.utils.aoa_to_sheet(comRows);
         XLSX.utils.book_append_sheet(wb, wsCom, "Comidas");
 
-        XLSX.writeFile(wb, `Rutina_Magnum_Gym_Actualizada_${new Date().toISOString().slice(0,10)}.xlsx`);
+        XLSX.writeFile(wb, `Rutina_Kratos_Actualizada_${new Date().toISOString().slice(0,10)}.xlsx`);
       };
 
       // Import JSON
@@ -1667,7 +1667,7 @@
       };
 
       // OFFLINE CACHE & CONNECTIVITY MANAGEMENT
-      const OFFLINE_CACHE_NAME = 'magnum-gym-v5';
+      const OFFLINE_CACHE_NAME = 'kratos-gym-v1';
       const OFFLINE_ASSETS = [
         './',
         './index.html',
