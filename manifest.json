@@ -3,9 +3,10 @@
   "short_name": "MagnumGym",
   "description": "App para registro y control de rutina de entrenamiento y cargas",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
+  "background_color": "#f1f5f9",
+  "theme_color": "#ffffff",
   "orientation": "portrait",
   "icons": [
     {

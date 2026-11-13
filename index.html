@@ -10,34 +10,12 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
 
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#f0fdf4',
-              500: '#10b981',
-              600: '#059669',
-            },
-            gym: {
-              blue: '#0284c7',
-              dark: '#0f172a'
-            }
-          }
-        }
-      }
-    }
-  </script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- QR Code generator for quick phone pairing -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <!-- SheetJS for Excel export -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Local compiled Tailwind CSS (100% offline ready) -->
+  <link rel="stylesheet" href="./styles.css">
+  <!-- Local JS libraries (100% offline ready) -->
+  <script src="./vendor/lucide.min.js"></script>
+  <script src="./vendor/qrcode.min.js" defer></script>
+  <script src="./vendor/xlsx.full.min.js" defer></script>
 
   <style>
     body {
@@ -68,7 +46,10 @@
         </div>
         <div>
           <h1 class="font-bold text-base tracking-tight text-slate-900 dark:text-white leading-tight">Magnum Gym</h1>
-          <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium tracking-wide">Rutina • Jesús Vega</span>
+          <div class="flex items-center gap-1.5">
+            <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium tracking-wide">Rutina • Jesús Vega</span>
+            <span id="offline-header-pill" class="hidden px-1.5 py-0.5 rounded-full text-[9px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30">SIN SEÑAL</span>
+          </div>
         </div>
       </div>
       
@@ -258,6 +239,24 @@
 
     <!-- SETTINGS & BACKUP VIEW -->
     <div id="settings-view" class="hidden space-y-4">
+      <!-- OFFLINE STATUS & CACHE PREPARATION CARD -->
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 space-y-3 shadow-sm">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+            <i data-lucide="wifi-off" class="w-4 h-4 text-emerald-500"></i>
+            Modo Sin Señal (Gimnasio)
+          </h3>
+          <span id="offline-ready-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">Verificando...</span>
+        </div>
+        <p id="offline-status-desc" class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+          La app guarda toda tu rutina, fotos y botones en la memoria de tu celular para abrir al instante aunque no tengas nada de señal en el gimnasio.
+        </p>
+        <button id="btn-sync-offline" class="w-full py-3 px-4 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 transition shadow-sm">
+          <i data-lucide="download-cloud" class="w-4 h-4"></i>
+          <span id="btn-sync-offline-text">Guardar / Actualizar para usar sin señal</span>
+        </button>
+      </div>
+
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 space-y-4 shadow-sm">
         <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
           <i data-lucide="save" class="w-4 h-4 text-sky-500"></i>
@@ -795,6 +794,17 @@
     let currentDay = '1';       // '1' | '2' | '3'
     let currentView = 'workout'; // 'workout' | 'timer' | 'meals' | 'settings'
 
+    // Safe Lucide icon initialization (never throws even if script failed to load)
+    function safeCreateIcons() {
+      try {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+          window.lucide.createIcons();
+        }
+      } catch (e) {
+        console.warn('Lucide icon render skipped:', e);
+      }
+    }
+
     // THEME MANAGEMENT (Default: Light / Color Claro)
     function initTheme() {
       const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
@@ -814,7 +824,7 @@
         if (themeIcon) themeIcon.setAttribute('data-lucide', 'moon');
       }
       localStorage.setItem(THEME_KEY, theme);
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
     function toggleTheme() {
@@ -968,7 +978,7 @@
           if (navIndicator) navIndicator.classList.add('hidden');
         }
       }
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
     function startTimer(seconds) {
@@ -1048,6 +1058,7 @@
         subtabsBar.classList.add('hidden');
         daySelector.classList.add('hidden');
         floatBar.classList.add('hidden');
+        if (typeof window.checkOfflineCacheStatus === 'function') window.checkOfflineCacheStatus();
       }
 
       document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -1095,7 +1106,7 @@
         renderExercises();
       }
 
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
     function openExerciseDetail(ex) {
@@ -1112,7 +1123,7 @@
       }
       
       document.getElementById('modal-exercise-detail').classList.remove('hidden');
-      lucide.createIcons();
+      safeCreateIcons();
     }
 
     function renderExercises() {
@@ -1249,7 +1260,7 @@
       document.getElementById('day-progress-text').textContent = `${completedSets}/${totalSets} series (${progressPercent}%)`;
       document.getElementById('day-progress-bar').style.width = `${progressPercent}%`;
 
-      lucide.createIcons();
+      safeCreateIcons();
       attachExerciseListeners();
     }
 
@@ -1551,15 +1562,19 @@
         document.getElementById('modal-qr').classList.remove('hidden');
         const qrContainer = document.getElementById('qrcode-container');
         qrContainer.innerHTML = '';
-        const phoneUrl = `http://192.168.1.107:8085`;
-        new QRCode(qrContainer, {
-          text: phoneUrl,
-          width: 180,
-          height: 180,
-          colorDark: "#0f172a",
-          colorLight: "#ffffff",
-          correctLevel: QRCode.CorrectLevel.M
-        });
+        const phoneUrl = window.location.href.split('#')[0].split('?')[0];
+        if (typeof QRCode !== 'undefined') {
+          new QRCode(qrContainer, {
+            text: phoneUrl,
+            width: 180,
+            height: 180,
+            colorDark: "#0f172a",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.M
+          });
+        } else {
+          qrContainer.innerHTML = '<p class="text-xs text-slate-500 p-4">QR disponible con la librería cargada.</p>';
+        }
         document.getElementById('ip-address-text').textContent = phoneUrl;
       };
       document.getElementById('modal-qr-close').onclick = () => {
@@ -1581,6 +1596,9 @@
 
       // Export Excel
       document.getElementById('btn-export-excel').onclick = () => {
+        if (typeof XLSX === 'undefined') {
+          return alert('La función de exportar a Excel aún está cargando. Intenta de nuevo en unos segundos.');
+        }
         const wb = XLSX.utils.book_new();
 
         const fbRows = [["Día", "Grupo", "Ejercicio", "Series", "Reps", "Carga (Kg)", "Notas"]];
@@ -1648,9 +1666,135 @@
         }
       };
 
-      // Register Service Worker
+      // OFFLINE CACHE & CONNECTIVITY MANAGEMENT
+      const OFFLINE_CACHE_NAME = 'magnum-gym-v5';
+      const OFFLINE_ASSETS = [
+        './',
+        './index.html',
+        './styles.css',
+        './manifest.json',
+        './icons/icon-192.png',
+        './icons/icon-512.png',
+        './vendor/lucide.min.js',
+        './vendor/qrcode.min.js',
+        './vendor/xlsx.full.min.js',
+        './images/exercises/banco_scott.jpg',
+        './images/exercises/camilla_isquios.jpg',
+        './images/exercises/curl_barra.jpg',
+        './images/exercises/dorsalera_polea.jpg',
+        './images/exercises/extension_polea.jpg',
+        './images/exercises/gemelos_parado.jpg',
+        './images/exercises/hack.jpg',
+        './images/exercises/martillo.jpg',
+        './images/exercises/peck_deck.jpg',
+        './images/exercises/prensa_45.jpg',
+        './images/exercises/press_hammer.jpg',
+        './images/exercises/press_maquina.jpg',
+        './images/exercises/press_plano.jpg',
+        './images/exercises/remo_polea_baja.jpg',
+        './images/exercises/sillon_cuadriceps.jpg',
+        './images/exercises/tirones_cerrado.jpg',
+        './images/exercises/vuelos_laterales.jpg'
+      ];
+
+      function updateOnlineStatus() {
+        const pill = document.getElementById('offline-header-pill');
+        if (!pill) return;
+        if (!navigator.onLine) {
+          pill.classList.remove('hidden');
+        } else {
+          pill.classList.add('hidden');
+        }
+      }
+
+      window.addEventListener('online', updateOnlineStatus);
+      window.addEventListener('offline', updateOnlineStatus);
+      updateOnlineStatus();
+
+      window.checkOfflineCacheStatus = async function() {
+        const badge = document.getElementById('offline-ready-badge');
+        const desc = document.getElementById('offline-status-desc');
+        if (!badge || !desc) return;
+        if (!('caches' in window)) {
+          badge.textContent = 'No disponible';
+          return;
+        }
+        try {
+          const cache = await caches.open(OFFLINE_CACHE_NAME);
+          let cachedCount = 0;
+          for (const asset of OFFLINE_ASSETS) {
+            const match = await cache.match(asset, { ignoreSearch: true });
+            if (match) cachedCount++;
+          }
+          if (cachedCount >= OFFLINE_ASSETS.length) {
+            badge.textContent = `Listo ✓ (${cachedCount}/${OFFLINE_ASSETS.length})`;
+            badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-500/20 dark:text-emerald-300';
+            desc.textContent = '✅ Toda tu rutina, botones y las 17 fotos ya están guardadas en tu celular. Funciona 100% sin señal en el gimnasio.';
+          } else {
+            badge.textContent = `Parcial (${cachedCount}/${OFFLINE_ASSETS.length})`;
+            badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300 dark:bg-amber-500/20 dark:text-amber-300';
+            desc.textContent = 'Faltan algunos archivos por guardar en tu celular. Toca el botón verde de abajo estando con internet para completar el guardado sin señal.';
+          }
+        } catch (err) {
+          badge.textContent = 'Verificando...';
+        }
+      };
+
+      async function cacheAllOfflineAssets(forceReload = false) {
+        if (!('caches' in window)) return;
+        const btnText = document.getElementById('btn-sync-offline-text');
+        if (forceReload && btnText) btnText.textContent = 'Guardando archivos...';
+        try {
+          const cache = await caches.open(OFFLINE_CACHE_NAME);
+          let saved = 0;
+          await Promise.allSettled(
+            OFFLINE_ASSETS.map(async (asset) => {
+              if (!forceReload) {
+                const existing = await cache.match(asset, { ignoreSearch: true });
+                if (existing) { saved++; return; }
+              }
+              const res = await fetch(asset, forceReload ? { cache: 'reload' } : {});
+              if (res && res.ok) {
+                await cache.put(asset, res.clone());
+                saved++;
+              }
+            })
+          );
+          if ('serviceWorker' in navigator) {
+            const reg = await navigator.serviceWorker.getRegistration();
+            if (reg) await reg.update();
+          }
+          await window.checkOfflineCacheStatus();
+          if (forceReload) {
+            if (btnText) btnText.textContent = '¡Guardado listo para usar sin señal!';
+            setTimeout(() => {
+              if (btnText) btnText.textContent = 'Guardar / Actualizar para usar sin señal';
+            }, 3000);
+          }
+        } catch (err) {
+          if (forceReload && btnText) {
+            btnText.textContent = 'Conéctate a internet para actualizar';
+            setTimeout(() => {
+              btnText.textContent = 'Guardar / Actualizar para usar sin señal';
+            }, 3000);
+          }
+        }
+      }
+
+      document.getElementById('btn-sync-offline').onclick = () => {
+        haptic();
+        cacheAllOfflineAssets(true);
+      };
+
+      // Register Service Worker & quietly ensure all assets are cached
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW register fail', err));
+        navigator.serviceWorker.register('sw.js').then((reg) => {
+          if (navigator.onLine) {
+            reg.update().catch(() => {});
+            cacheAllOfflineAssets(false);
+          }
+          window.checkOfflineCacheStatus();
+        }).catch(err => console.log('SW register fail', err));
       }
     });
   </script>
